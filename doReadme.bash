@@ -1,4 +1,13 @@
-!# /usr/bin/bash
+#! /usr/bin/bash
 
-pdflatex -interaction=errorstopmode README.tex 2> /dev/null
-pandoc -f latex -t markdown --strip-comments README.tex | sed -re 's/\{\.[a-z-]+\}//gi' > README.md
+pdflatex README.tex
+pandoc -f latex -t markdown --strip-comments README.tex \
+| sed -r \
+    -e 's/\[([^]]+)\]\{\.[a-z-]+\}/\1/g' \
+    -e 's/\[(\[[^\]+\]\([^\]+\))\]\{\.[a-z-]+\}/\1/g' \
+    -e 's/\s+\{\#[a-z-]+\s+\.[a-z-]+\}//g' \
+    > README.md
+	# the three expressions remove anchors and styling syntax:
+	# - [text]{.style}
+	# - [[text](link)]{.style}
+	# - {#section-anchor .style}
