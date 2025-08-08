@@ -12,14 +12,14 @@
 \maketitle
 
 \texttt{fountain-parser} is a small parser library for the
-\link{https://fountain.io/}{Fountain} screenplay format,
-supporting 1.1 version
+\link{https://fountain.io/}{\textsf{Fountain}} screenplay format,
+fully supporting 1.1 version
 \link{https://fountain.io/syntax/}{syntax} and
 producing a simple, easy to grok \textsf{AST}.
 
 \texttt{fountain-parser} is written in
-\link{https://haskell.org}{Haskell} and it uses the
-\link{https://hackage.haskell.org/package/megaparsec}{Megaparsec}
+\link{https://haskell.org}{\textsf{Haskell}} and it uses the
+\link{https://hackage.haskell.org/package/megaparsec}{\textsf{Megaparsec}}
 library for parsing.
 
 \section{Motivation}
@@ -27,7 +27,7 @@ The ``\emph{Developers}'' section of the Fountain site provides a
 link to a
 \link{https://github.com/nyousefi/Fountain}{parsing library}
 in \textsf{Objective~C}. This already presents a portability
-issue:there \emph{are} projects that make it possible to connect
+issue: there \emph{are} projects that make it possible to connect
 Objective C to Haskell, but they're either platform- or
 framework-specific.  It also employs a multi-pass stategy where
 every stage creates a modified version of the source, and it's
@@ -38,8 +38,8 @@ solution, it's necessary to start from scratch.
 
 \texttt{fountain-parser} aims to power a series of command-line
 utilities for conversion from Fountain to a series of convenient
-formats, such as \texttt{.OTF} or \texttt{.PDF}, without the
-intervention of thirds.
+formats, such as \texttt{.OTF}, \texttt{.TEX} or \texttt{.PDF},
+without the intervention of thirds.
 
 \section{Implementation Specifics}
 Fountain files are \textsf{UTF-8} text files. While this library
@@ -49,7 +49,13 @@ files to have the extension \texttt{.fountain}, \texttt{.txt} or
 ``\textbf{S}creen\textbf{p}lay \textbf{M}ark\textbf{d}own'',
 one of the formats that eventually merged into Fountain.)
 
-
-
+\subsection{But my software already supports Fountain!}
+Sure, and the \link{https://fountain.io/apps/}{``\emph{Apps}´´
+  section} of the Fountain site lists a few more. The caveat: most
+are either cloud-based and/or proprietary. By favoring (mostly)
+open formats, \emph{fountain-parse} allows integration into
+many FLOSS tools, helping the creation of compound documents
+(such as production bibles) and entirely non-proprietary
+workflows.
 
 \end{document}
