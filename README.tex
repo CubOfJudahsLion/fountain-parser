@@ -1,0 +1,46 @@
+\documentclass[12pt]{article}
+\usepackage{xcolor}
+\definecolor{darkblue}{rgb}{0,0,0.33}
+\usepackage{hyperref}
+\newcommand{\link}[2]{\underline{\color{darkblue}\href{#1}{#2}}}
+\usepackage{parskip}
+
+\begin{document}
+\title{\textbf{fountain-parser README}}
+\author{}
+\date{}
+\maketitle
+
+\texttt{fountain-parser} is a small parser library for the
+\link{https://fountain.io/}{Fountain} screenplay format,
+supporting 1.1 version
+\link{https://fountain.io/syntax/}{syntax} and
+producing a simple, easy to grok \textsf{AST}.
+
+\texttt{fountain-parser} is written in
+\link{https://haskell.org}{Haskell} and it uses the
+\link{https://hackage.haskell.org/package/megaparsec}{Megaparsec}
+library for parsing.
+
+\section{Motivation}
+The Fountain authors have implemented a 
+\link{https://github.com/nyousefi/Fountain}{parsing library}
+in \textsf{Objective~C}. Portability would be an issue here:
+there \emph{are} projects that make it possible to connect
+Objective C to Haskell, but they're either platform or
+framework-specific.  Their library also employs a multi-pass
+stategy where every stage creates a modified version of the
+source, and it's heavily reliant on \emph{Regular Expressions}.
+
+Thus, to create a light-weight, performant and portable
+solution, it's necessary to start from scratch --- an opportunity
+the author relishes.
+
+\section{Implementation Specifics}
+Fountain files are \textsf{UTF-8} text files. While this library
+doesn't impose any file naming scheme, it is customary for Fountain
+files to have the extension \texttt{.fountain}, \texttt{.txt} or
+\texttt{.spmd} (the latter for historical reasons.)
+
+
+\end{document}
