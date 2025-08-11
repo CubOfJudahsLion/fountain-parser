@@ -1,39 +1,44 @@
-\documentclass[12pt]{article}
+\documentclass[11pt]{article}
 \usepackage{xcolor}
 \definecolor{darkblue}{rgb}{0,0,0.33}
 \usepackage{hyperref}
 \newcommand{\link}[2]{\underline{\color{darkblue}\href{#1}{#2}}}
+\renewcommand{\familydefault}{\sfdefault}
 \usepackage{parskip}
 
 \begin{document}
-\title{\textbf{fountain-parser README}}
+\title{\textbf{fountain-parser v.0.1.0.0 README}}
 \author{}
 \date{}
 \maketitle
 
 \section*{Synopsis}
 \texttt{fountain-parser} is a small parser library for the
-\link{https://fountain.io/}{\textsf{Fountain}} screenplay format,
+\link{https://fountain.io/}{\textrm{Fountain}} screenplay format,
 fully supporting 1.1 version
 \link{https://fountain.io/syntax/}{syntax} and
-producing a simple, easy to grok \textsf{AST}.
+producing a simple, easy to grok \textrm{AST}.
 
 \texttt{fountain-parser} is written in
-\link{https://haskell.org}{\textsf{Haskell}} and it uses the
-\link{https://hackage.haskell.org/package/megaparsec}{\textsf{Megaparsec}}
+\link{https://haskell.org}{\textrm{Haskell}} and it uses the
+\link{https://hackage.haskell.org/package/megaparsec}{\textrm{Megaparsec}}
 library for parsing.
 
-\section*{Status}
+\section*{Disclaimer}
 Currently, this is \emph{pre-alpha} software, not yet usable in
-any form. We'll have something testable soon enough.
+productive form.
+
+This software is distributed under the
+\emph{\textrm{BSD Three-Clause license}}.
+See the \link{run:./LICENSE}{LICENSE} file for more details.
 
 \section*{Motivation}
 The ``\emph{Developers}'' section of the Fountain site provides a
 link to a
 \link{https://github.com/nyousefi/Fountain}{parsing library}
-in \textsf{Objective~C}. This already presents a portability
-issue: there \emph{are} projects that make it possible to connect
-Objective C to Haskell, but they're either platform- or
+in \textrm{Objective~C}. This already presents a portability
+issue: there \emph{are} projects that make it possible to bridge
+Objective C and Haskell, but they're platform- or
 framework-specific.  It also employs a multi-pass stategy where
 every stage creates a modified version of the source, and it's
 heavily reliant on \emph{Regular Expressions}.
@@ -46,29 +51,59 @@ utilities for conversion from Fountain to a series of convenient
 formats, such as \texttt{.OTF}, \texttt{.TEX} or \texttt{.PDF},
 without the intervention of thirds.
 
-\section*{Implementation Specifics}
-Fountain files are \textsf{UTF-8} text files. While this library
-doesn't impose any file naming scheme, it is customary for Fountain
-files to have the extension \texttt{.fountain}, \texttt{.txt} or
-\texttt{.spmd} (meaning
-``\textbf{S}creen\textbf{p}lay \textbf{M}ark\textbf{d}own'',
-the format that eventually became Fountain.)
-
-\subsection*{But my software already supports Fountain!}
-The \link{https://fountain.io/apps/}{``\emph{Apps}''
-section} of the Fountain site lists a number of apps that can
-import or export the format. The caveat: most are either
+\subsection*{My software already supports Fountain}
+Of course. And the
+\link{https://fountain.io/apps/}{``\emph{Apps}''
+section} of the Fountain site lists a few that also import or
+export the format. \textbf{The caveat}: most are either
 cloud-based and/or proprietary. By favoring (mostly) open formats,
-\emph{fountain-parse} allows integration into many FLOSS tools,
-helping the creation of compound documents (such as production
-bibles) and entirely non-proprietary workflows.
+\emph{fountain-parse} allows integration into many \textrm{FLOSS}
+tools, helping the creation of compound documents (such as
+production bibles) and entirely non-proprietary workflows.
+
+\section*{Implementation Specifics}
+\begin{itemize}
+  \item As per spec:
+    \begin{itemize}
+      \item This library expects Fountain text to be
+        encoded in \textrm{UTF-8}.
+      \item Tabs are converted into four spaces.
+      \item Your line-spacing is respected.
+    \end{itemize}
+  \item All parsing functions expect \texttt{Text} inputs. File
+    I/O is left to the application or framework.
+  \item Formatting (boldface, underline) found in such entities
+    as character names or scene headings is ignored.
+  \item Vertical tabs an form feed characters are ignored. Use
+    line returns and the Fountain form feed character sequence
+    (``\texttt{===}'') instead.
+  \item The parser keeps everything, including notes, boneyards
+    and synopses, in case the target format is capable of
+    storing this metadata.
+\end{itemize}
+
+\section*{Building}
+\textrm{GHC} 9.6.7 and \textrm{Cabal} 3.0 (or greater) are
+required to compile and run the test suite (once implemented.)
+
+The project uses the \texttt{GHC2021} language default. While
+it might be possible to compile it in earlier versions than
+9.6.7, this default is only available since 9.2.1., so that
+constitutes a hard version limit for those who might wish to
+experiment.
+
+Some of the included scripts require Linux or a Linux-like
+environment (e.g.,
+\link{https://www.msys2.org/}{\textrm{MSYS2}}.)
 
 \section*{Contact}
-Please create an issue if you find one.
+Please
+\link{https://github.com/CubOfJudahsLion/fountain-parser/issues}{create an issue}
+if you find one.
 
 I can be reached directly at
-\emph{\textsf{10951848+C\"{u}b\^{O}fJ\'{u}d\~{a}hsL\^{i}\`{o}n}
-at \textsf{users/noreply/g\^{i}th\~{u}b/c\"{o}m}} (without accents and
-replacing slashes by periods.)
+\emph{\textrm{10951848+C\"{u}b\b{O}fJ\'{u}d\~{a}hsL\^{i}\`{o}n}}
+\u{a}(t) \emph{\textrm{users/noreply/g\={i}th\d{u}b/c\.{o}m}}
+(without accents and replacing slashes by periods.)
 
 \end{document}

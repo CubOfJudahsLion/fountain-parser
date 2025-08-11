@@ -1,32 +1,36 @@
 # Synopsis
 
 `fountain-parser` is a small parser library for the
-<u>[<span class="sans-serif">Fountain</span>](https://fountain.io/)</u>
+[<span style="font-family: serif">Fountain</span>](https://fountain.io/)
 screenplay format, fully supporting 1.1 version
-<u>[syntax](https://fountain.io/syntax/)</u> and producing a simple,
-easy to grok <span class="sans-serif">AST</span>.
+[syntax](https://fountain.io/syntax/) and producing a simple,
+easy to grok <span style="font-family: serif">AST</span>.
 
 `fountain-parser` is written in
-<u>[<span class="sans-serif">Haskell</span>](https://haskell.org)</u>
-and it uses the
-<u>[<span class="sans-serif">Megaparsec</span>](https://hackage.haskell.org/package/megaparsec)</u>
+[<span style="font-family: serif">Haskell</span>](https://haskell.org) and it
+uses the
+[<span style="font-family: serif">Megaparsec</span>](https://hackage.haskell.org/package/megaparsec)
 library for parsing.
 
-# Status
+# Disclaimer
 
-Currently, this is *pre-alpha* software, not yet usable in any form.
-We’ll have something testable soon enough.
+Currently, this is *pre-alpha* software, not yet usable in productive
+form.
+
+This software is distributed under the *<span style="font-family: serif">BSD
+Three-Clause license</span>*. See the [LICENSE](run:./LICENSE)
+file for more details.
 
 # Motivation
 
 The “*Developers*” section of the Fountain site provides a link to a
-<u>[parsing library](https://github.com/nyousefi/Fountain)</u> in
-<span class="sans-serif">Objective C</span>. This already presents a
-portability issue: there *are* projects that make it possible to connect
-Objective C to Haskell, but they’re either platform- or
-framework-specific. It also employs a multi-pass stategy where every
-stage creates a modified version of the source, and it’s heavily reliant
-on *Regular Expressions*.
+[parsing library](https://github.com/nyousefi/Fountain) in
+<span style="font-family: serif">Objective C</span>. This already presents a
+portability issue: there *are* projects that make it possible to bridge
+Objective C and Haskell, but they’re platform- or framework-specific. It
+also employs a multi-pass stategy where every stage creates a modified
+version of the source, and it’s heavily reliant on *Regular
+Expressions*.
 
 Thus, to create a light-weight, performant and portable solution, it’s
 necessary to start from scratch.
@@ -35,28 +39,61 @@ necessary to start from scratch.
 conversion from Fountain to a series of convenient formats, such as
 `.OTF`, `.TEX` or `.PDF`, without the intervention of thirds.
 
+## My software already supports Fountain
+
+Of course. And the [“*Apps*” section](https://fountain.io/apps/)
+of the Fountain site lists a few that also import or export the format.
+**The caveat**: most are either cloud-based and/or proprietary. By
+favoring (mostly) open formats, *fountain-parse* allows integration into
+many <span style="font-family: serif">FLOSS</span> tools, helping the creation of
+compound documents (such as production bibles) and entirely
+non-proprietary workflows.
+
 # Implementation Specifics
 
-Fountain files are <span class="sans-serif">UTF-8</span> text files.
-While this library doesn’t impose any file naming scheme, it is
-customary for Fountain files to have the extension `.fountain`, `.txt`
-or `.spmd` (meaning “**S**creen**p**lay **M**ark**d**own”, the format
-that eventually became Fountain.)
+- As per spec:
 
-## But my software already supports Fountain!
+  - This library expects Fountain text to be encoded in
+    <span style="font-family: serif">UTF-8</span>.
 
-The <u>[“*Apps*” section](https://fountain.io/apps/)</u> of the Fountain
-site lists a number of apps that can import or export the format. The
-caveat: most are either cloud-based and/or proprietary. By favoring
-(mostly) open formats, *fountain-parse* allows integration into many
-FLOSS tools, helping the creation of compound documents (such as
-production bibles) and entirely non-proprietary workflows.
+  - Tabs are converted into four spaces.
+
+  - Your line-spacing is respected.
+
+- All parsing functions expect `Text` inputs. File I/O is left to the
+  application or framework.
+
+- Formatting (boldface, underline) found in such entities as character
+  names or scene headings is ignored.
+
+- Vertical tabs an form feed characters are ignored. Use line returns
+  and the Fountain form feed character sequence (“`===`”) instead.
+
+- The parser keeps everything, including notes, boneyards and synopses,
+  in case the target format is capable of storing this metadata.
+
+# Building
+
+<span style="font-family: serif">GHC</span> 9.6.7 and
+<span style="font-family: serif">Cabal</span> 3.0 (or greater) are required to
+compile and run the test suite (once implemented.)
+
+The project uses the `GHC2021` language default. While it might be
+possible to compile it in earlier versions than 9.6.7, this default is
+only available since 9.2.1., so that constitutes a hard version limit
+for those who might wish to experiment.
+
+Some of the included scripts require Linux or a Linux-like environment
+(e.g.,
+[<span style="font-family: serif">MSYS2</span>](https://www.msys2.org/).)
 
 # Contact
 
-Please create an issue if you find one.
+Please [create an
+issue](https://github.com/CubOfJudahsLion/fountain-parser/issues) if
+you find one.
 
 I can be reached directly at
-*<span class="sans-serif">10951848+CübÔfJúdãhsLîòn</span> at
-<span class="sans-serif">users/noreply/gîthũb/cöm</span>* (without
-accents and replacing slashes by periods.)
+*<span style="font-family: serif">10951848+CübO̱fJúdãhsLîòn</span>* ă(t)
+*<span style="font-family: serif">users/noreply/gīthụb/cȯm</span>* (without accents
+and replacing slashes by periods.)
