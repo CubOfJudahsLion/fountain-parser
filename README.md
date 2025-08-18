@@ -10,7 +10,8 @@ easy to grok <span style="font-family: serif">AST</span>.
 <u>[<span style="font-family: serif">Haskell</span>](https://haskell.org)</u> and it
 uses the
 <u>[<span style="font-family: serif">Megaparsec</span>](https://hackage.haskell.org/package/megaparsec)</u>
-library for parsing.
+library for parsing. Megaparsec might sound like overkill for this
+modest purpose, but
 
 # Disclaimer
 
@@ -78,8 +79,13 @@ non-proprietary workflows.
 - Unicode spaces are turned into the vanilla space, except for the *hair
   space*, which is discarded.
 
-- The parser discards notes, boneyards, sections and synopses. Only
-  printable content is retained.
+- The parser keeps everything: notes, boneyards, sections and synopses.
+  Some possible conversion targets have equivalents and might want to
+  conserve them.
+
+## Tentative Grammar
+
+While the <span style="font-family: serif">Fountain</span> spec does not have a
 
 # Building
 
