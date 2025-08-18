@@ -1,0 +1,81 @@
+; An attempt to put the Fountain syntax into an actual EBNF grammar, trying to err on the side of lenience.
+; It"s also very ambiguous at the moment, requiring unrestricted lookahead or backtracking.
+
+
+fountain_screenplay = *empty_line (script_content / cover_page 1*empty_line script_content)
+
+cover_page = 1*cover_entry
+
+cover_entry = cover_key *space ":" *space cover_value
+
+cover_key = "TITLE" / "CREDIT" / "AUTHOR" / "SOURCE" / "DRAFT DATE" / "CONTACT"
+
+cover_value = single_value / multi_value
+
+single_value = 1*non_newline newline
+
+multi_value = newline 1*indented_sub_value
+
+indented_sub_value = 1*space 1*non_newline newline
+
+script_content = *(section_indicator / master_scene / synopse)
+
+section_indicator = 1*"#" *sopace 1*non_newline newline empty_line
+
+master_scene = master_scene_heading scene_content
+
+master_scene_heading = int_ext scene_description *scene_number *space newline empty_line
+
+int_ext = ("I" (["."] "/" ["E"] / ("NT" ["."] "/EXT")) / "E" ("ST" / "XT")) ("." / space)
+
+scene_description = *space 1*non_newline_or_hash
+
+scene_number = "#" 1*scene_number_character "#" *space
+
+
+
+
+
+
+
+
+
+
+
+scene_number_character = alphanumeric / "-" / "."
+
+uppercase_letter  = %x41-5A
+
+alphanumeric = alpha / digit
+
+space = " "
+      / %x00A0      ; non-breaking 
+      / %x2000-2009 ; varying-width Em/Em-based spaces 
+      / %x202F      ; narrow non-breaking 
+      / %x205F      ; mathematical middle-space 
+      / %x3000      ; Ideographic space 
+      ; These are turned into the regular space; we're trying to imitate a typewriter.
+      ; Hairline or zero-width spaces and joiners are pre-filtered out previous to parsing.
+      ; Same goes for control characters.
+
+newline = cr [lf]
+        / lf [cr]
+        / %x0B    ; We interpret vertical tabbing as a newline too 
+        / %x0C    ; As well as form-feeding 
+        / %x0085  ; Unicode next-line 
+        / %x2028  ; Unicode line-separator 
+        / %x2029  ; Unicode paragraph-separator 
+        ; These are all converted into the POSIX newline "\n"
+
+empty_line = *space newline ;
+
+character = ?any Unicode character? ;
+
+non_newline = character - newline
+
+non_newline_or_hash = non_newline - "#"
+
+start_of_file = ?start of file?
+
+end_of_file = ?end of file?
+
