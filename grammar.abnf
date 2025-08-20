@@ -65,4 +65,3 @@ character = <any Unicode character>
 non-newline = <character - newline>
 
 non-newline-or-hash = <non-newline - "#">
-
