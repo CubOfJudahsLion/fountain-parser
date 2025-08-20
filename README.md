@@ -89,103 +89,74 @@ drawing from the [syntax guide](https://fountain.io/syntax/) and
 incorporates <span style="font-variant: small-caps">Unicode</span> codepoints and it
 tries to err in the side of lenience.
 
-<span style="color: gray">; The grammar is currently very ambiguous,
-requiring unrestricted lookahead or backtracking.</span>  
-**fountain-screenplay** = \*empty-line (script-content / cover-page
-1\*empty-line script-content)  
-**cover-page** = 1\*cover-entry  
-**cover-entry** = cover-key \*space <span style="color: red">":"</span>
-\*space cover-value  
-**cover-key** = <span style="color: red">"TITLE"</span> /
-<span style="color: red">"CREDIT"</span> /
-<span style="color: red">"AUTHOR"</span> /
-<span style="color: red">"SOURCE"</span> /
-<span style="color: red">"DRAFT DATE"</span> /
-<span style="color: red">"CONTACT"</span>  
-**cover-value** = single-value / multi-value  
-**single-value** = 1\*non-newline newline  
-**multi-value** = newline 1\*indented-sub-value  
-**indented-sub-value** = (htab / 2\*8(space)) 1\*non-newline newline  
-**script-content** = \*(section-indicator / master-scene / synopse)  
-**section-indicator** = 1\*<span style="color: red">"#"</span> \*space
-1\*non-newline newline empty-line  
-**master-scene** = master-scene-heading scene-content  
-**master-scene-heading** = int-ext scene-description \*scene-number
-\*space newline empty-line  
-**int-ext** = (<span style="color: red">"I"</span>
-(\[<span style="color: red">"."</span>\]
-<span style="color: red">"/"</span>
-\[<span style="color: red">"E"</span>\] /
-(<span style="color: red">"NT"</span>
-\[<span style="color: red">"."</span>\]
-<span style="color: red">"/EXT"</span>)) /
-<span style="color: red">"E"</span>
-(<span style="color: red">"ST"</span> /
-<span style="color: red">"XT"</span>))
-(<span style="color: red">"."</span> / space)  
-**scene-description** = \*space 1\*non-newline-or-hash  
-**scene-number** = <span style="color: red">"#"</span>
-1\*scene-number-character <span style="color: red">"#"</span> \*space  
-**scene-number-character** = alphanumeric /
-<span style="color: red">"-"</span> /
-<span style="color: red">"."</span>  
-**uppercase-letter**  = <span style="color: red">%x41-5A</span>  
-**digit** = <span style="color: red">"0"</span> /
-<span style="color: red">"1"</span> /
-<span style="color: red">"2"</span> /
-<span style="color: red">"3"</span> /
-<span style="color: red">"4"</span> /
-<span style="color: red">"5"</span> /
-<span style="color: red">"6"</span> /
-<span style="color: red">"7"</span> /
-<span style="color: red">"8"</span> /
-<span style="color: red">"9"</span>  
-**alphanumeric** = alpha / digit  
-**space** = <span style="color: red">" "</span>  
-      /
-<span style="color: red">%x00A0</span>      <span style="color: gray">;
-non-breaking</span>  
-      / <span style="color: red">%x2000-2009</span>
-<span style="color: gray">; varying-width Em/En-based spaces</span>  
-      /
-<span style="color: red">%x202F</span>      <span style="color: gray">;
-narrow non-breaking</span>  
-      /
-<span style="color: red">%x205F</span>      <span style="color: gray">;
-mathematical middle-space</span>  
-      /
-<span style="color: red">%x3000</span>)     <span style="color: gray">;
-Ideographic space</span>  
-      <span style="color: gray">; These are turned into the regular
-space; we’re trying to imitate a typewriter.</span>  
-      <span style="color: gray">; Hairline or zero-width spaces and
-joiners are pre-filtered out previous to parsing.</span>  
-      <span style="color: gray">; Same goes for control
-characters.</span>  
-**newline** = cr \[lf\]  
-        / lf \[cr\]  
-        /
-<span style="color: red">%x0B</span>    <span style="color: gray">; We
-interpret vertical tabbing as a newline too</span>  
-        /
-<span style="color: red">%x0C</span>    <span style="color: gray">; As
-well as form-feeding</span>  
-        /
-<span style="color: red">%x0085</span>  <span style="color: gray">;
-Unicode next-line</span>  
-        /
-<span style="color: red">%x2028</span>  <span style="color: gray">;
-Unicode line-separator</span>  
-        /
-<span style="color: red">%x2029</span>  <span style="color: gray">;
-Unicode paragraph-separator</span>  
-        <span style="color: gray">; These are all converted into the
-POSIX newline "\n".</span>  
-**empty-line** = \*space newline  
-**character** = \<any Unicode character\>  
-**non-newline** = \<character - newline\>  
-**non-newline-or-hash** = \<non-newline -
-<span style="color: red">"#"</span>\>  
+<span style="color: gray">`; The grammar is currently very ambiguous, requiring unrestricted lookahead or backtracking.`</span>  
+  
+**`fountain-screenplay`**` = *empty-line (script-content / cover-page 1*empty-line script-content)`  
+  
+**`cover-page`**` = 1*cover-entry`  
+  
+**`cover-entry`**` = cover-key *space `<span style="color: red">`":"`</span>` *space cover-value`  
+  
+**`cover-key`**` = `<span style="color: red">`"TITLE"`</span>` / `<span style="color: red">`"CREDIT"`</span>` / `<span style="color: red">`"AUTHOR"`</span>` / `<span style="color: red">`"SOURCE"`</span>` / `<span style="color: red">`"DRAFT DATE"`</span>` / `<span style="color: red">`"CONTACT"`</span>  
+  
+**`cover-value`**` = single-value / multi-value`  
+  
+**`single-value`**` = 1*non-newline newline`  
+  
+**`multi-value`**` = newline 1*indented-sub-value`  
+  
+**`indented-sub-value`**` = (htab / 2*8(space)) 1*non-newline newline`  
+  
+**`script-content`**` = *(section-indicator / master-scene / synopse)`  
+  
+**`section-indicator`**` = 1*`<span style="color: red">`"#"`</span>` *space 1*non-newline newline empty-line`  
+  
+**`master-scene`**` = master-scene-heading scene-content`  
+  
+**`master-scene-heading`**` = int-ext scene-description *scene-number *space newline empty-line`  
+  
+**`int-ext`**` = (`<span style="color: red">`"I"`</span>` ([`<span style="color: red">`"."`</span>`] `<span style="color: red">`"/"`</span>` [`<span style="color: red">`"E"`</span>`] / (`<span style="color: red">`"NT"`</span>` [`<span style="color: red">`"."`</span>`] `<span style="color: red">`"/EXT"`</span>`)) / `<span style="color: red">`"E"`</span>` (`<span style="color: red">`"ST"`</span>` / `<span style="color: red">`"XT"`</span>`)) (`<span style="color: red">`"."`</span>` / space)`  
+  
+**`scene-description`**` = *space 1*non-newline-or-hash`  
+  
+**`scene-number`**` = `<span style="color: red">`"#"`</span>` 1*scene-number-character `<span style="color: red">`"#"`</span>` *space`  
+  
+  
+**`scene-number-character`**` = alphanumeric / `<span style="color: red">`"-"`</span>` / `<span style="color: red">`"."`</span>  
+  
+**`uppercase-letter`**`  = `<span style="color: red">`%x41-5A`</span>  
+  
+**`digit`**` = `<span style="color: red">`"0"`</span>` / `<span style="color: red">`"1"`</span>` / `<span style="color: red">`"2"`</span>` / `<span style="color: red">`"3"`</span>` / `<span style="color: red">`"4"`</span>` / `<span style="color: red">`"5"`</span>` / `<span style="color: red">`"6"`</span>` / `<span style="color: red">`"7"`</span>` / `<span style="color: red">`"8"`</span>` / `<span style="color: red">`"9"`</span>  
+  
+**`alphanumeric`**` = alpha / digit`  
+  
+**`space`**` = `<span style="color: red">`" "`</span>  
+`      / `<span style="color: red">`%x00A0`</span>`      `<span style="color: gray">`; non-breaking`</span>  
+`      / `<span style="color: red">`%x2000-2009`</span>` `<span style="color: gray">`; varying-width Em/En-based spaces`</span>  
+`      / `<span style="color: red">`%x202F`</span>`      `<span style="color: gray">`; narrow non-breaking`</span>  
+`      / `<span style="color: red">`%x205F`</span>`      `<span style="color: gray">`; mathematical middle-space`</span>  
+`      / `<span style="color: red">`%x3000`</span>`)     `<span style="color: gray">`; Ideographic space`</span>  
+`      `<span style="color: gray">`; These are turned into the regular space; we’re trying to imitate a typewriter.`</span>  
+`      `<span style="color: gray">`; Hairline or zero-width spaces and joiners are pre-filtered out previous to parsing.`</span>  
+`      `<span style="color: gray">`; Same goes for control characters.`</span>  
+  
+**`newline`**` = cr [lf]`  
+`        / lf [cr]`  
+`        / `<span style="color: red">`%x0B`</span>`    `<span style="color: gray">`; We interpret vertical tabbing as a newline too`</span>  
+`        / `<span style="color: red">`%x0C`</span>`    `<span style="color: gray">`; As well as form-feeding`</span>  
+`        / `<span style="color: red">`%x0085`</span>`  `<span style="color: gray">`; Unicode next-line`</span>  
+`        / `<span style="color: red">`%x2028`</span>`  `<span style="color: gray">`; Unicode line-separator`</span>  
+`        / `<span style="color: red">`%x2029`</span>`  `<span style="color: gray">`; Unicode paragraph-separator`</span>  
+`        `<span style="color: gray">`; These are all converted into the POSIX newline "\n".`</span>  
+  
+**`empty-line`**` = *space newline`  
+  
+**`character`**` = <any Unicode character>`  
+  
+**`non-newline`**` = <character - newline>`  
+  
+**`non-newline-or-hash`**` = <non-newline - `<span style="color: red">`"#"`</span>`>`  
+  
 
 # Building
 

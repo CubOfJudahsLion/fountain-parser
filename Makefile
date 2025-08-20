@@ -13,7 +13,7 @@ README.pdf: $(README_SOURCES)
 
 README.md: $(README_SOURCES)
 	-rm README.md
-	pandoc -f latex -t commonmark --strip-comments --standalone README.tex \
+	pandoc -f latex -t markdown_github --strip-comments --standalone README.tex \
 	| sed -re 's/<span class="smallcaps">/<span style="font-variant: small-caps">/g' \
 	> README.md
 

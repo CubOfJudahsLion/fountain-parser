@@ -32,7 +32,7 @@ BEGIN {
 
 # Blank lines are just printed and further processing is skipped.
 /^[[:blank:]]*$/ {
-    print "";
+    print "\\\\";
     next;
 }
 
@@ -87,7 +87,7 @@ function mbox_spaces(str,    parts, p, acc) {
 / {2,}/ { $0 = mbox_spaces($0); }
 
 # Add explicit line terminators.
-{ print $0 "\\\\" }
+{ print "\\texttt{" $0 "}\\\\" }
 
 END {
     print "}"; # end small text
