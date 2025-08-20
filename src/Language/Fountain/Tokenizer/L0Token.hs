@@ -45,7 +45,7 @@ l0TokenContent (L0Content t)  = t
 
 
 -- |  Level zero token stream: just a list of 'L0Token's.
---    Conveniently, /Megaparsec/ turns lists automatically
+--    Conveniently, Megaparsec turns lists automatically
 --    into 'Text.Megaparsec.Stream.Stream's as long as the base type is an
 --    instance of 'Prelude.Ord'
 type L0Stream = [L0Token]

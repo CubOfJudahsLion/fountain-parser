@@ -5,6 +5,8 @@
 \newcommand{\link}[2]{\underline{\color{darkblue}\href{#1}{#2}}}
 \renewcommand{\familydefault}{\sfdefault}
 \usepackage{parskip}
+\usepackage[margin=2cm]{geometry}
+\usepackage{courier}
 
 \begin{document}
 \title{\textbf{fountain-parser v.0.1.0.0 README}}
@@ -12,113 +14,109 @@
 \date{}
 \maketitle
 
-\section*{Synopsis}
-\texttt{fountain-parser} is a small parser library for the
-\link{https://fountain.io/}{\textrm{Fountain}} screenplay format,
-fully supporting 1.1 version
-\link{https://fountain.io/syntax/}{syntax} and
-producing a simple, easy to grok \textrm{AST}.
+\section*{Synopsis} \texttt{fountain-parser} is a small parser library
+for the \link{https://fountain.io/}{\textsc{Fountain}} screenplay
+format, fully supporting 1.1 version
+\link{https://fountain.io/syntax/}{syntax} and producing a simple, easy
+easy to grok \textsc{AST}.
 
 \texttt{fountain-parser} is written in
-\link{https://haskell.org}{\textrm{Haskell}} and it uses the
-\link{https://hackage.haskell.org/package/megaparsec}{\textrm{Megaparsec}}
-library for parsing. Megaparsec might sound like overkill for this
-modest purpose, but 
+\link{https://haskell.org}{\textsc{Haskell}} and it uses the
+\link{https://hackage.haskell.org/package/megaparsec}{\textsc{Megaparsec}}
+library for parsing.
 
 \section*{Disclaimer}
 Currently, this is \emph{pre-alpha} software, not yet usable in
 productive form.
 
-This software is distributed under the
-\emph{\textrm{BSD Three-Clause license}}.
-See the \link{run:./LICENSE}{LICENSE} file for more details.
+This software is distributed \emph{as-is} under the terms of the
+\textsc{BSD Three-Clause license}.  See the
+\link{run:./LICENSE}{LICENSE} file for more details.
 
-\section*{Motivation}
-The ``\emph{Developers}'' section of the Fountain site provides a
-link to a
-\link{https://github.com/nyousefi/Fountain}{parsing library}
-in \textrm{Objective~C}. This already presents a portability
-issue: there \emph{are} projects that make it possible to bridge
-Objective C and Haskell, but they're platform- or
-framework-specific.  It also employs a multi-pass stategy where
-every stage creates a modified version of the source, and it's
-heavily reliant on \emph{Regular Expressions}.
+\section*{Motivation} The
+\link{https://fountain.io/developers/}{\emph{Developers} section} of the
+Fountain site provides a link to a
+\link{https://github.com/nyousefi/Fountain}{parsing library} in
+\textsc{Objective~C}. This presents a portability issue: there
+\emph{are} projects that make it possible to bridge \textsc{Objective~C}
+and \textsc{Haskell}, they’re platform- or framework-specific.  That
+library informs this project in matching the different Fountain entities
+even as it uses different parsing methods.
 
-Thus, to create a light-weight, performant and portable
-solution, it's necessary to start from scratch.
-
+\subsection*{Prospective Related Projects}
 \texttt{fountain-parser} aims to power a series of command-line
-utilities for conversion from Fountain to a series of convenient
-formats, (\texttt{.OTF}, \texttt{.TEX}) without intervention
+utilities for conversion from \textsc{Fountain} to a series of
+convenient formats, (\texttt{.OTF}, \texttt{.TEX}) without intervention
 from thirds.
 
-  \subsection*{My software already supports Fountain}
-  Of course. The
-  \link{https://fountain.io/apps/}{``\emph{Apps}''
-  section} of the Fountain site lists a few that also import or
-  export the format. \textbf{The caveat}: most are either
-  cloud-based and/or proprietary. By favoring (mostly) open
-  formats, \emph{fountain-parse} allows integration into many
-  \textrm{FLOSS} tools, helping the creation of compound
-  documents (such as production bibles) and entirely
-  non-proprietary workflows.
+\subsection*{My software already supports Fountain}
+The \link{https://fountain.io/apps/}{\emph{Apps} section} of the
+\textsc{Fountain} site lists software that also imports or exports the
+format. There's a caveat: most are either \emph{cloud-based} and/or
+\emph{proprietary}. By favoring (mostly) open formats,
+\emph{fountain-parse} allows integration into many \textsc{FLOSS} tools,
+enabling entirely non-proprietary workflows and helping the creation of
+compound documents such as production bibles.
 
 \section*{Implementation Specifics}
   \begin{itemize}
-    \item As per spec:
+    \item As per the \href{https://fountain.io/syntax/}{syntax guide}:
       \begin{itemize}
-        \item This library expects Fountain text to be
-          encoded in \textrm{UTF-8}.
+        \item This library expects Fountain text to be encoded in
+          \textsc{UTF-8}.
         \item Tabs are converted into \textbf{four} spaces.
         \item Your line-spacing is respected.
-        \item Initial spaces are ignored everywhere except in
-          non-\texttt{\textgreater{}centered{}\textless} action
+        \item Initial spaces are ignored everywhere except in action
           lines.
-        \item A line with two spaces doesn't count as
-          an empty line.
+        \item A line with two spaces doesn't count as an empty line.
       \end{itemize}
-    \item All parsing functions expect \texttt{Text} inputs.
-      File I/O is left to the application or framework.
-    \item Formatting (boldface, underline) found in such
-      entities as character names or scene headings is
-      ignored.
-    \item Vertical tabs and form-feed characters are
-      interpreted as line changes. For vertical spacing, use
-      multiple blank lines and/or the Fountain form feed
-      character sequence (``\texttt{===}'') instead.
-    \item Unicode spaces are turned into the vanilla space,
-      except for the \emph{hair space}, which is discarded.
-    \item The parser keeps everything: notes, boneyards,
-      sections and synopses. Some possible conversion targets
-      have equivalents and might want to conserve them.
+    \item All parsing functions expect \texttt{Text} inputs.  File I/O
+      is left to the application or framework.
+    \item Varying-width \textsc{Unicode} spaces are either converted
+      into regular spaces or suppressed if they're hairline- or
+      zero-width.
+    \item Vertical tabs and form-feed characters are interpreted as line
+      changes. For vertical spacing, use multiple blank lines and/or the
+      Fountain form feed character sequence instead.
+    \item The parser keeps everything: notes, boneyards, sections and
+      synopses. Some possible conversion targets have equivalents to
+      those, thus it might be desirable to preserve them.
   \end{itemize}
 
-  \subsection*{Tentative Grammar}
-  While the \textrm{Fountain} spec does not have a
+  \subsection*{Tentative Formal Grammar}
+  The following is an attempt to formalize the syntax in
+  \href{https://datatracker.ietf.org/doc/html/rfc5234}{\textsc{ABNF}},
+  drawing from the \href{https://fountain.io/syntax/}{syntax guide} and
+  \textsc{Objective~C} implementation.  It incorporates \textsc{Unicode}
+  codepoints and it tries to err in the side of lenience.
   
+  \input{./grammar.tex}
 
 \section*{Building}
-\textrm{GHC} 9.6.7 and \textrm{Cabal} 3.0 (or greater) are
-required to compile and run the test suite (once implemented.)
+\textsc{GHC} 9.6.7 and \textsc{Cabal} 3.0 (or greater) are required to
+compile and run the test suite (once implemented.)
 
-The project uses the \texttt{GHC2021} language default. While
-it might be possible to compile it in earlier versions than
-9.6.7, this default is only available since 9.2.1., so that
-constitutes a hard version limit for those who might wish to
-experiment.
+The project uses the \texttt{GHC2021} language default. While it might
+be possible to compile it in earlier versions than 9.6.7, this default
+is only available since 9.2.1., so that constitutes a hard version limit
+for those who want to try other versions.
 
-Some of the included scripts require Linux or a Linux-like
-environment (e.g.,
-\link{https://www.msys2.org/}{\textrm{MSYS2}}.)
+Some of the included scripts require \texttt{make}, \texttt{awk} and
+other similar utilities usually found in \textsc{Linux} or
+\textsc{Linux}-like environments (e.g.,
+\link{https://www.msys2.org/}{\textsc{MSYS2}}.) However, nothing
+prevents the user from running \texttt{cabal}, \texttt{pandoc} or
+\texttt{pdflatex} as shown in the
+\link{run:./Makefile}{\texttt{Makefile}}.
 
-\section*{Contact}
-Please
+\section*{Contact} Please
 \link{https://github.com/CubOfJudahsLion/fountain-parser/issues}{create an issue}
 if you find a bug.
 
 I can be reached directly at
-\emph{\textrm{10951848+C\"{u}b\b{O}fJ\'{u}d\~{a}hsL\^{i}\`{o}n}}
-\u{a}(t) \emph{\textrm{users/noreply/g\={i}th\d{u}b/c\.{o}m}}
-(without accents and replacing slashes by periods.)
+\emph{10951848+C\"{u}b\b{O}fJ\'{u}d\~{a}hsL\^{i}\`{o}n} \u{a}(t)
+\emph{users/noreply/g\={i}th\d{u}b/c\.{o}m} (without accents and
+replacing slashes by periods.)
 
 \end{document}
+
