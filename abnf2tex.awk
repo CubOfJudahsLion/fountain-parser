@@ -1,7 +1,9 @@
 #! /usr/bin/awk -f
 
 ## This script makes a few pattern-based transformation to add
-## some LaTeX formatting to an ABNF grammar.
+## some LaTeX formatting to an ABNF grammar. It assumes the
+## following packages installed and used in the master document: 
+## color, hyperref, parskip, geometry and courier.
 
 
 # Repeats the string str n times.
@@ -13,7 +15,7 @@ function repeat_str(n, str,    i, acc) {
 }
 
 BEGIN {
-    print "{\\footnotesize"; # start small text, please
+    print "{\\footnotesize\\texttt{{"; # start small monospaced text, please
     # tab conversion
     tab_size = 4;
     tab_replacement = repeat_str(" ", tab_size);
@@ -87,8 +89,8 @@ function mbox_spaces(str,    parts, p, acc) {
 / {2,}/ { $0 = mbox_spaces($0); }
 
 # Add explicit line terminators.
-{ print "\\texttt{" $0 "}\\\\" }
+{ print $0 "\\\\" }
 
 END {
-    print "}"; # end small text
+    print "}}}"; # end small monospaed text
 }
