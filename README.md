@@ -93,7 +93,7 @@ drawing from the [syntax guide](https://fountain.io/syntax/) and
 incorporates <span style="font-variant: small-caps">Unicode</span> codepoints and it
 tries to err in the side of lenience.
 
-```
+``` abnf
 ; The grammar is currently very ambiguous, requiring unrestricted lookahead or backtracking.
 
 fountain-screenplay = *empty-line (script-content / cover-page 1*empty-line script-content)
