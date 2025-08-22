@@ -1,6 +1,6 @@
 # !/usr/bin/make
 
-# Required tools: awk, sed, find, pandoc, pdflatex and of course Cabal and GHC.
+# Required tools: sed, find, pandoc, pdflatex and of course Cabal and GHC.
 
 .PHONY: test, doc, readmes, all, cleanup
 
@@ -29,8 +29,8 @@ README.md: $(README_SOURCES)
 	-re 's/<span class="roman">/<span style="font-family: serif">/g' \
 	> README.md
 
-grammar.tex: grammar.abnf abnf2tex.awk
-	./abnf2tex.awk grammar.abnf > grammar.tex
+grammar.tex: grammar.abnf abnf2latex.hs
+	./abnf2latex.hs grammar.abnf > grammar.tex
 
 test:
 	cabal test

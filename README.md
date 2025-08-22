@@ -140,7 +140,7 @@ space = " "
       / %x2000-2009 ; varying-width Em/En-based spaces
       / %x202F      ; narrow non-breaking
       / %x205F      ; mathematical middle-space
-      / %x3000)     ; Ideographic space
+      / %x3000      ; Ideographic space
       ; These are turned into the regular space; we're trying to imitate a typewriter.
       ; Hairline or zero-width spaces and joiners are pre-filtered out previous to parsing.
       ; Same goes for control characters.
@@ -161,7 +161,6 @@ character = <any Unicode character>
 non-newline = <character - newline>
 
 non-newline-or-hash = <non-newline - "#">
-
 ```
 
 # Building
