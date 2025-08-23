@@ -30,14 +30,17 @@
 
   ----
 
-  This is a script using GHC's builtin-in parser to pretty-print an ABNF file into a LaTeX
-  fragment, following RFC 5234 (https://www.rfc-editor.org/rfc/rfc5234).
+  This is a script using GHC's builtin-in parser to pretty-print an ABNF file (as defined by
+  RFCs 5234 (https://www.rfc-editor.org/rfc/rfc5234) and 7405
+  (https://www.rfc-editor.org/rfc/rfc7405) into a LaTeX fragment.
 
-  Written just. One doesn't really have to parse something to pretty-print it in most cases.
+  Written mostly for fun. One doesn't really have to parse something to pretty-print it in
+  most cases.
 
-  The RFC directly provides the parsing scheme. Nonetheless, the implementation remains
-  much improvable: to begin with, because of size, this probably should be a project on its
-  own, and a better parsing library could be used.
+  The RFCs directly provide the parsing scheme, though this parser is slightly more flexible:
+  it doesn't require spacing between elements or a newline after the final rule.
+  Nevertheless, the implementation remains much improvable: to begin with, because of size,
+  this probably should be a project on its own, and a better parsing library could be used.
 
   The including document must use the following packages:
     - xcolor package with the dvipsnames option.
@@ -58,34 +61,10 @@ import Data.Foldable ( foldl' )
 import Data.Kind ( Type )
 import Data.List ( intercalate, singleton, uncons )
 import Data.Maybe ( fromMaybe )
---import Data.Semigroup ( Max(..) )
 import System.Environment ( getArgs )
 import System.Exit ( die )
 import System.IO ( stdin, stdout, openFile, hClose, hGetContents', hPutStr, IOMode(ReadMode, WriteMode) )
-import Text.ParserCombinators.ReadP   -- Good enough for the job.
-
-
-----------------------------------------
---  Endomorphic monoidal functions
-----------------------------------------
-
---  A wrapper for a conditional function.
-newtype OptionalFunction m = OptionalFunction { getOptFn :: Maybe (m -> m) }
-
---  If an actual function is stored, it's run on its input and the result returned,
---  otherwise the input value is returned unchanged.
-runOptional :: OptionalFunction m -> m -> m
-runOptional = ($) . fromMaybe id . getOptFn
-
---  The Semigroup binop favors non-empty functions, composes them if both are present. 
-instance Semigroup (OptionalFunction m) where
-  (<>) (OptionalFunction Nothing) (OptionalFunction f)            = OptionalFunction f
-  (<>) (OptionalFunction f) (OptionalFunction Nothing)            = OptionalFunction f
-  (<>) (OptionalFunction (Just f1)) (OptionalFunction (Just f2))  = OptionalFunction (Just (f1 . f2))
-
---  The Monoid, of course, produces an absent function as mempty
-instance Monoid (OptionalFunction m) where
-  mempty = OptionalFunction Nothing
+import Text.ParserCombinators.ReadP
 
 
 ----------------------------------------
@@ -98,10 +77,17 @@ data NumValBase = Hex !Char
                 | Bin !Char
   deriving (Eq, Show)
 
+--  Whether 
+data CaseSensitivity  = CaseSensitive !Char
+                      | CaseInsensitive !Char
+                      | ImplicitCaseInsensitive
+  deriving (Eq, Show)
+
 --  Posible digit additions to a first digit group in a numeric string
 data ExtraNumDigits = NoExtraDigits
                     | RangeDigits !String
                     | DigitChain ![String]
+  deriving (Eq, Show)
 
 --  Specifies repetitions of an element. If omitted it means one rep.
 data RepetitionBounds = RepsCount !String                         -- A specific number of reps 1*digit
@@ -109,8 +95,8 @@ data RepetitionBounds = RepsCount !String                         -- A specific 
   deriving (Eq, Show)
 
 
---  Tree representation of the ABNF document (in terms of visual entities)
-data ParseTree  = CharVal !String                           -- String as a double-quoted [multi]-character value
+--  Simple tree representation of the ABNF document
+data ParseTree  = CharVal !CaseSensitivity !String          -- String as a double-quoted [multi]-character value
                 | NumValSingle !NumValBase !String          -- String as a single number preceded by %[bdc]
                 | NumValRange !NumValBase !String !String   -- String as a range (%[bdc] followed by two dash-separated numbers)
                 | NumValSequence !NumValBase ![String]      -- String as a sequence (%[bdc] followed by multiple dot-separated numbers)
@@ -214,12 +200,26 @@ maxMany1 p = do
 
 
 ----------------------------------------
---  Parser routines
+--  Parsing routines
 ----------------------------------------
+
+--  Reads a possibly implicit case sensitivity (before double-quoted strings)
+caseSensitivity :: ReadP CaseSensitivity
+caseSensitivity =   (   char '%'
+                    *>  (   (CaseInsensitive <$> satisfy (`elem` ['i', 'I']))
+                        +++ (CaseSensitive   <$> satisfy (`elem` ['s', 'S']))
+                        )
+                    )
+                <++ pure ImplicitCaseInsensitive
 
 --  Reads a 'char-val', a double-quited sring
 charVal :: ReadP ParseTree
-charVal = char '"' *> (CharVal <$> munch (\c -> isPrint c && c /= '"')) <* char '"'
+charVal = do
+  sensitivity <- caseSensitivity
+  void $ char '"'
+  strContent <- munch (\c -> isPrint c && c /= '"')
+  void $ char '"'
+  pure $ CharVal sensitivity strContent
 
 --  Reads a 'num-val', a numerically depicted string, in hex, decimal or binary digits
 numVal :: ReadP ParseTree
@@ -441,11 +441,11 @@ rulelist  =   Rulelist . concat
 class DocumentRepresentable d where
   --  Produce a String from the representable.
   --  The Bool specifies where pretty-printing should be used or not
-  docRep :: Bool -> d -> String
+  docRep :: d -> String
 
 --  Automatic instance: any array of representables is representable itself
 instance (DocumentRepresentable d) => DocumentRepresentable [d] where
-  docRep prettyPrint ds = concatMap (docRep prettyPrint) ds
+  docRep ds = concatMap docRep ds
 
 
 ----------------------------------------
@@ -459,64 +459,54 @@ baseLetter (Dec c)  = c
 baseLetter (Bin c)  = c
 
 
---  For monoids, produces the given value if ?keep is true, mempty otherwise
-condVal :: (Monoid m, ?keep :: Bool) => m -> m
-condVal val = if ?keep then val else mempty
-
-
 --  Repetition bound specifications have document representations
 instance DocumentRepresentable RepetitionBounds where
-  docRep prettyPrint bounds  =
-    let
-      (?\) :: Monoid m => m -> m
-      (?\) = let ?keep = prettyPrint in condVal
-    in
-      (?\) "\\textcolor{MidnightBlue}{\\emph{" ++ docRep' bounds ++ (?\) "}}"
+  docRep bounds = "\\textcolor{MidnightBlue}{\\emph{" ++ docRep' bounds ++ "}}"
     where
       docRep' :: RepetitionBounds -> String
       docRep' (RepsCount count)       = count
       docRep' (RepLimits lower upper) = fromMaybe "" lower ++ "*" ++ fromMaybe "" upper
 
+
+--  Case insensitivity is also representable
+instance DocumentRepresentable CaseSensitivity where
+  docRep ImplicitCaseInsensitive  = ""
+  docRep (CaseInsensitive c)      = "\\textbf{\\%{}" ++ c : "}"
+  docRep (CaseSensitive c)        = "\\textbf{\\%{}" ++ c : "}"
+
+
 --  Returns parse trees to String form, whether for prettyprinting or as raw text.
 instance DocumentRepresentable ParseTree where
-  docRep prettyPrint tree =
-    let
-      --  The ?\ unary operator conditionally applies markup if pretty-printing
-      (?\) :: Monoid m => m -> m
-      (?\) = let ?keep = prettyPrint in condVal
-      --  The ?$ unary operator conditionally converts the string to a LaTeX-escaped one if pretty-printing
-      (?$) :: String -> String
-      (?$) = runOptional $ (?\) stringAsLaTeX
-    in
-      case tree of
-        (CharVal s)                       ->  (?\) "\\textcolor{BrickRed}{" ++ '"' : (?$) s ++ '"' : (?\) "}"
-        (NumValSingle base digits)        ->  (?\) "\\textcolor{Brown}{\\textbf{\\" ++ '%' : (?\) "{}"
-                                              ++ baseLetter base : (?\) "}" ++ digits ++ (?\) "}"
-        (NumValRange base start end)      ->  (?\) "\\textcolor{Brown}{\\textbf{\\" ++ '%' : (?\) "{}"
-                                              ++ baseLetter base : (?\) "}" ++ start ++ (?\) "\\textbf{" ++ '-' : (?\) "}" ++ end ++ (?\) "}"
-        (NumValSequence base digitGroups) ->  (?\) "\\textcolor{Brown}{\\textbf{\\" ++ '%' : (?\) "{}"
-                                              ++ baseLetter base : (?\) "}"
-                                              ++ intercalate ((?\) "\\textbf{" ++ '.' : (?\) "}") digitGroups ++ (?\) "}"
-        (Prose prose)                     ->  '<' : (?\) "\\emph{" ++ (?$) prose ++ (?\) "}" ++ ">"
-        (Rulename name)                   ->  (?$) name
-        (Whitespace w)                    ->  [w]
-        (Whitespaces ws)                  ->  (?\) "\\mbox{" ++ fmap (const '~') ws ++ (?\) "}"
-        (Printable s)                     ->  (?$) s
-        (Comment tree)                    ->  (?\) "\\textcolor{Gray}{" ++ ';' : docRep True tree ++ (?\) "}"
-        (Newline nl)                      ->  (?\) "\\\\" ++ nl
-        (Repetition bounds element)       ->  docRep prettyPrint bounds ++ docRep prettyPrint element
-        (Concatenation trees)             ->  docRep prettyPrint trees
-        AlternationOperator               ->  (?\) "\\textbf{" ++ '/' : (?\) "}"
-        (Alternation trees)               ->  docRep prettyPrint trees
-        (Group trees)                     ->  (?\) "\\textbf{" ++ '(' : (?\) "}" ++ docRep prettyPrint trees ++ (?\) "\\textbf{" ++ ')' : (?\) "}"
-        (Option trees)                    ->  (?\) "\\textbf{" ++ '[' : (?\) "}" ++ docRep prettyPrint trees ++ (?\) "\\textbf{" ++ ']' : (?\) "}"
-        (RuleDefinitionOperator op)       ->  (?\) "\\textbf{" ++ op ++ (?\) "}"
-        (RuleDefinition trees)            ->  docRep prettyPrint trees
-        (Rule name trees)                 ->  (?\) "\\textbf{" ++ docRep prettyPrint name ++ (?\) "}" ++ docRep prettyPrint trees
-        (Rulelist trees)                  ->  (?\) "{\\footnotesize\\ttfamily\n" ++ docRep prettyPrint trees ++ (?\) "\n}"
+  docRep tree = case tree of
+    (CharVal caseSensitivity str)     ->  "\\textcolor{BrickRed}{" ++ docRep caseSensitivity ++ '"' : stringAsLaTeX str ++ '"' : "}"
+    (NumValSingle base digits)        ->  numValPrelude ++ baseLetter base : "}" ++ digits ++ "}"
+    (NumValRange base start end)      ->  numValPrelude ++ baseLetter base : "}" ++ start ++ "\\textbf{" ++ '-' : "}" ++ end ++ "}"
+    (NumValSequence base digitGroups) ->  numValPrelude ++ baseLetter base : "}" ++ intercalate ("\\textbf{" ++ '.' : "}") digitGroups ++ "}"
+    (Prose prose)                     ->  '<' : "\\emph{" ++ stringAsLaTeX prose ++ "}" ++ ">"
+    (Rulename name)                   ->  stringAsLaTeX name
+    (Whitespace w)                    ->  [w]
+    (Whitespaces ws)                  ->  "\\mbox{" ++ fmap (const '~') ws ++ "}"
+    (Printable s)                     ->  stringAsLaTeX s
+    (Comment tree)                    ->  "\\textcolor{Gray}{" ++ ';' : docRep tree ++ "}"
+    (Newline nl)                      ->  "\\\\" ++ nl
+    (Repetition bounds element)       ->  docRep bounds ++ docRep element
+    (Concatenation trees)             ->  docRep trees
+    AlternationOperator               ->  "\\textbf{" ++ '/' : "}"
+    (Alternation trees)               ->  docRep trees
+    (Group trees)                     ->  "\\textbf{" ++ '(' : "}" ++ docRep trees ++ "\\textbf{" ++ ')' : "}"
+    (Option trees)                    ->  "\\textbf{" ++ '[' : "}" ++ docRep trees ++ "\\textbf{" ++ ']' : "}"
+    (RuleDefinitionOperator op)       ->  "\\textbf{" ++ op ++ "}"
+    (RuleDefinition trees)            ->  docRep trees
+    (Rule name trees)                 ->  "\\textbf{" ++ docRep name ++ "}" ++ docRep trees
+    (Rulelist trees)                  ->  "{\\footnotesize\\ttfamily\n" ++ docRep trees ++ "\n}"
     where
+      --  Common LaTeX prelude for all num-vals
+      numValPrelude :: String
+      numValPrelude = "\\textcolor{Brown}{\\textbf{\\%{}"
+      --
       --  Converts a single character into a LaTeX escape sequence, if any
       charAsLaTeX :: Char -> String
+      charAsLaTeX '-'              = "-{}"
       charAsLaTeX '<'              = "\\textless{}"
       charAsLaTeX '>'              = "\\textgreater{}"
       charAsLaTeX '~'              = "\\textasciitilde{}"
@@ -529,15 +519,15 @@ instance DocumentRepresentable ParseTree where
         | otherwise               = [c]
       --
       --  Replaces all special LaTeX characters in string with equivalent literals
-      stringAsLaTeX :: OptionalFunction String
-      stringAsLaTeX = OptionalFunction (Just (concatMap charAsLaTeX))
+      stringAsLaTeX :: String -> String
+      stringAsLaTeX = concatMap charAsLaTeX
 
 
 --  Processes the file. If successful, LaTeX prettyprinting codes are returned.
 --  Otherwise, Nothing is produced. The parser might produce multiple parsings,
 --  so  we'll use the longest (last.)
 processABNF :: String -> Maybe String
-processABNF = fmap (docRep True . fst . fst) . uncons . reverse . readP_to_S rulelist
+processABNF = fmap (docRep . fst . fst) . uncons . reverse . readP_to_S rulelist
 
 
 ----------------------------------------

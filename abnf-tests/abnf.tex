@@ -4,61 +4,61 @@
 \usepackage{parskip}
 \begin{document}
 {\footnotesize\ttfamily
-\textbf{rulelist}\mbox{~~~~~~~}\textbf{=}\mbox{~~}\textcolor{MidnightBlue}{\emph{1*}}\textbf{(} rule \textbf{/} \textbf{(}\textcolor{MidnightBlue}{\emph{*}}c-wsp c-nl\textbf{)} \textbf{)}\\
+\textbf{rulelist}\mbox{~~~~~~~}\textbf{=}\mbox{~~}\textcolor{MidnightBlue}{\emph{1*}}\textbf{(} rule \textbf{/} \textbf{(}\textcolor{MidnightBlue}{\emph{*}}c-{}wsp c-{}nl\textbf{)} \textbf{)}\\
 \\
-\textbf{rule}\mbox{~~~~~~~~~~~}\textbf{=}\mbox{~~}rulename defined-as elements c-nl\\
+\textbf{rule}\mbox{~~~~~~~~~~~}\textbf{=}\mbox{~~}rulename defined-{}as elements c-{}nl\\
 \mbox{~~~~~~~~~~~~~~~~~~~~~~~}\textcolor{Gray}{; continues if next line starts}\\
 \mbox{~~~~~~~~~~~~~~~~~~~~~~~}\textcolor{Gray}{;\mbox{~~}with white space}\\
 \\
-\textbf{rulename}\mbox{~~~~~~~}\textbf{=}\mbox{~~}ALPHA \textcolor{MidnightBlue}{\emph{*}}\textbf{(}ALPHA \textbf{/} DIGIT \textbf{/} \textcolor{BrickRed}{"-"}\textbf{)}\\
+\textbf{rulename}\mbox{~~~~~~~}\textbf{=}\mbox{~~}ALPHA \textcolor{MidnightBlue}{\emph{*}}\textbf{(}ALPHA \textbf{/} DIGIT \textbf{/} \textcolor{BrickRed}{"-{}"}\textbf{)}\\
 \\
-\textbf{defined-as}\mbox{~~~~~}\textbf{=}\mbox{~~}\textcolor{MidnightBlue}{\emph{*}}c-wsp \textbf{(}\textcolor{BrickRed}{"="} \textbf{/} \textcolor{BrickRed}{"=/"}\textbf{)} \textcolor{MidnightBlue}{\emph{*}}c-wsp\\
+\textbf{defined-{}as}\mbox{~~~~~}\textbf{=}\mbox{~~}\textcolor{MidnightBlue}{\emph{*}}c-{}wsp \textbf{(}\textcolor{BrickRed}{"="} \textbf{/} \textcolor{BrickRed}{"=/"}\textbf{)} \textcolor{MidnightBlue}{\emph{*}}c-{}wsp\\
 \mbox{~~~~~~~~~~~~~~~~~~~~~~~}\textcolor{Gray}{; basic rules definition and}\\
 \mbox{~~~~~~~~~~~~~~~~~~~~~~~}\textcolor{Gray}{;\mbox{~~}incremental alternatives}\\
 \\
-\textbf{elements}\mbox{~~~~~~~}\textbf{=}\mbox{~~}alternation \textcolor{MidnightBlue}{\emph{*}}c-wsp\\
+\textbf{elements}\mbox{~~~~~~~}\textbf{=}\mbox{~~}alternation \textcolor{MidnightBlue}{\emph{*}}c-{}wsp\\
 \\
-\textbf{c-wsp}\mbox{~~~~~~~~~~}\textbf{=}\mbox{~~}WSP \textbf{/} \textbf{(}c-nl WSP\textbf{)}\\
+\textbf{c-{}wsp}\mbox{~~~~~~~~~~}\textbf{=}\mbox{~~}WSP \textbf{/} \textbf{(}c-{}nl WSP\textbf{)}\\
 \\
-\textbf{c-nl}\mbox{~~~~~~~~~~~}\textbf{=}\mbox{~~}comment \textbf{/} CRLF\\
+\textbf{c-{}nl}\mbox{~~~~~~~~~~~}\textbf{=}\mbox{~~}comment \textbf{/} CRLF\\
 \mbox{~~~~~~~~~~~~~~~~~~~~~~~}\textcolor{Gray}{; comment or newline}\\
 \\
 \textbf{comment}\mbox{~~~~~~~~}\textbf{=}\mbox{~~}\textcolor{BrickRed}{";"} \textcolor{MidnightBlue}{\emph{*}}\textbf{(}WSP \textbf{/} VCHAR\textbf{)} CRLF\\
 \\
 \textbf{alternation}\mbox{~~~~}\textbf{=}\mbox{~~}concatenation\\
-\mbox{~~~~~~~~~~~~~~~~~~}\textcolor{MidnightBlue}{\emph{*}}\textbf{(}\textcolor{MidnightBlue}{\emph{*}}c-wsp \textcolor{BrickRed}{"/"} \textcolor{MidnightBlue}{\emph{*}}c-wsp concatenation\textbf{)}\\
+\mbox{~~~~~~~~~~~~~~~~~~}\textcolor{MidnightBlue}{\emph{*}}\textbf{(}\textcolor{MidnightBlue}{\emph{*}}c-{}wsp \textcolor{BrickRed}{"/"} \textcolor{MidnightBlue}{\emph{*}}c-{}wsp concatenation\textbf{)}\\
 \\
-\textbf{concatenation}\mbox{~~}\textbf{=}\mbox{~~}repetition \textcolor{MidnightBlue}{\emph{*}}\textbf{(}\textcolor{MidnightBlue}{\emph{1*}}c-wsp repetition\textbf{)}\\
+\textbf{concatenation}\mbox{~~}\textbf{=}\mbox{~~}repetition \textcolor{MidnightBlue}{\emph{*}}\textbf{(}\textcolor{MidnightBlue}{\emph{1*}}c-{}wsp repetition\textbf{)}\\
 \\
 \textbf{repetition}\mbox{~~~~~}\textbf{=}\mbox{~~}\textbf{[}repeat\textbf{]} element\\
 \\
 \textbf{repeat}\mbox{~~~~~~~~~}\textbf{=}\mbox{~~}\textcolor{MidnightBlue}{\emph{1*}}DIGIT \textbf{/} \textbf{(}\textcolor{MidnightBlue}{\emph{*}}DIGIT \textcolor{BrickRed}{"*"} \textcolor{MidnightBlue}{\emph{*}}DIGIT\textbf{)}\\
 \\
 \textbf{element}\mbox{~~~~~~~~}\textbf{=}\mbox{~~}rulename \textbf{/} group \textbf{/} option \textbf{/}\\
-\mbox{~~~~~~~~~~~~~~~~~~}char-val \textbf{/} num-val \textbf{/} prose-val\\
+\mbox{~~~~~~~~~~~~~~~~~~}char-{}val \textbf{/} num-{}val \textbf{/} prose-{}val\\
 \\
-\textbf{group}\mbox{~~~~~~~~~~}\textbf{=}\mbox{~~}\textcolor{BrickRed}{"("} \textcolor{MidnightBlue}{\emph{*}}c-wsp alternation \textcolor{MidnightBlue}{\emph{*}}c-wsp \textcolor{BrickRed}{")"}\\
+\textbf{group}\mbox{~~~~~~~~~~}\textbf{=}\mbox{~~}\textcolor{BrickRed}{"("} \textcolor{MidnightBlue}{\emph{*}}c-{}wsp alternation \textcolor{MidnightBlue}{\emph{*}}c-{}wsp \textcolor{BrickRed}{")"}\\
 \\
-\textbf{option}\mbox{~~~~~~~~~}\textbf{=}\mbox{~~}\textcolor{BrickRed}{"["} \textcolor{MidnightBlue}{\emph{*}}c-wsp alternation \textcolor{MidnightBlue}{\emph{*}}c-wsp \textcolor{BrickRed}{"]"}\\
+\textbf{option}\mbox{~~~~~~~~~}\textbf{=}\mbox{~~}\textcolor{BrickRed}{"["} \textcolor{MidnightBlue}{\emph{*}}c-{}wsp alternation \textcolor{MidnightBlue}{\emph{*}}c-{}wsp \textcolor{BrickRed}{"]"}\\
 \\
-\textbf{char-val}\mbox{~~~~~~~}\textbf{=}\mbox{~~}DQUOTE \textcolor{MidnightBlue}{\emph{*}}\textbf{(}\textcolor{Brown}{\textbf{\%{}x}20\textbf{-}21} \textbf{/} \textcolor{Brown}{\textbf{\%{}x}23\textbf{-}7E}\textbf{)} DQUOTE\\
+\textbf{char-{}val}\mbox{~~~~~~~}\textbf{=}\mbox{~~}DQUOTE \textcolor{MidnightBlue}{\emph{*}}\textbf{(}\textcolor{Brown}{\textbf{\%{}x}20\textbf{-}21} \textbf{/} \textcolor{Brown}{\textbf{\%{}x}23\textbf{-}7E}\textbf{)} DQUOTE\\
 \mbox{~~~~~~~~~~~~~~~~~~~~~~~}\textcolor{Gray}{; quoted string of SP and VCHAR}\\
 \mbox{~~~~~~~~~~~~~~~~~~~~~~~}\textcolor{Gray}{;\mbox{~~}without DQUOTE}\\
 \\
-\textbf{num-val}\mbox{~~~~~~~~}\textbf{=}\mbox{~~}\textcolor{BrickRed}{"\%{}"} \textbf{(}bin-val \textbf{/} dec-val \textbf{/} hex-val\textbf{)}\\
+\textbf{num-{}val}\mbox{~~~~~~~~}\textbf{=}\mbox{~~}\textcolor{BrickRed}{"\%{}"} \textbf{(}bin-{}val \textbf{/} dec-{}val \textbf{/} hex-{}val\textbf{)}\\
 \\
-\textbf{bin-val}\mbox{~~~~~~~~}\textbf{=}\mbox{~~}\textcolor{BrickRed}{"b"} \textcolor{MidnightBlue}{\emph{1*}}BIT\\
-\mbox{~~~~~~~~~~~~~~~~~~}\textbf{[} \textcolor{MidnightBlue}{\emph{1*}}\textbf{(}\textcolor{BrickRed}{"."} \textcolor{MidnightBlue}{\emph{1*}}BIT\textbf{)} \textbf{/} \textbf{(}\textcolor{BrickRed}{"-"} \textcolor{MidnightBlue}{\emph{1*}}BIT\textbf{)} \textbf{]}\\
+\textbf{bin-{}val}\mbox{~~~~~~~~}\textbf{=}\mbox{~~}\textcolor{BrickRed}{"b"} \textcolor{MidnightBlue}{\emph{1*}}BIT\\
+\mbox{~~~~~~~~~~~~~~~~~~}\textbf{[} \textcolor{MidnightBlue}{\emph{1*}}\textbf{(}\textcolor{BrickRed}{"."} \textcolor{MidnightBlue}{\emph{1*}}BIT\textbf{)} \textbf{/} \textbf{(}\textcolor{BrickRed}{"-{}"} \textcolor{MidnightBlue}{\emph{1*}}BIT\textbf{)} \textbf{]}\\
 \mbox{~~~~~~~~~~~~~~~~~~~~~~~}\textcolor{Gray}{; series of concatenated bit values}\\
 \mbox{~~~~~~~~~~~~~~~~~~~~~~~}\textcolor{Gray}{;\mbox{~~}or single ONEOF range}\\
 \\
-\textbf{dec-val}\mbox{~~~~~~~~}\textbf{=}\mbox{~~}\textcolor{BrickRed}{"d"} \textcolor{MidnightBlue}{\emph{1*}}DIGIT\\
-\mbox{~~~~~~~~~~~~~~~~~~}\textbf{[} \textcolor{MidnightBlue}{\emph{1*}}\textbf{(}\textcolor{BrickRed}{"."} \textcolor{MidnightBlue}{\emph{1*}}DIGIT\textbf{)} \textbf{/} \textbf{(}\textcolor{BrickRed}{"-"} \textcolor{MidnightBlue}{\emph{1*}}DIGIT\textbf{)} \textbf{]}\\
+\textbf{dec-{}val}\mbox{~~~~~~~~}\textbf{=}\mbox{~~}\textcolor{BrickRed}{"d"} \textcolor{MidnightBlue}{\emph{1*}}DIGIT\\
+\mbox{~~~~~~~~~~~~~~~~~~}\textbf{[} \textcolor{MidnightBlue}{\emph{1*}}\textbf{(}\textcolor{BrickRed}{"."} \textcolor{MidnightBlue}{\emph{1*}}DIGIT\textbf{)} \textbf{/} \textbf{(}\textcolor{BrickRed}{"-{}"} \textcolor{MidnightBlue}{\emph{1*}}DIGIT\textbf{)} \textbf{]}\\
 \\
-\textbf{hex-val}\mbox{~~~~~~~~}\textbf{=}\mbox{~~}\textcolor{BrickRed}{"x"} \textcolor{MidnightBlue}{\emph{1*}}HEXDIG\\
-\mbox{~~~~~~~~~~~~~~~~~~}\textbf{[} \textcolor{MidnightBlue}{\emph{1*}}\textbf{(}\textcolor{BrickRed}{"."} \textcolor{MidnightBlue}{\emph{1*}}HEXDIG\textbf{)} \textbf{/} \textbf{(}\textcolor{BrickRed}{"-"} \textcolor{MidnightBlue}{\emph{1*}}HEXDIG\textbf{)} \textbf{]}\\
+\textbf{hex-{}val}\mbox{~~~~~~~~}\textbf{=}\mbox{~~}\textcolor{BrickRed}{"x"} \textcolor{MidnightBlue}{\emph{1*}}HEXDIG\\
+\mbox{~~~~~~~~~~~~~~~~~~}\textbf{[} \textcolor{MidnightBlue}{\emph{1*}}\textbf{(}\textcolor{BrickRed}{"."} \textcolor{MidnightBlue}{\emph{1*}}HEXDIG\textbf{)} \textbf{/} \textbf{(}\textcolor{BrickRed}{"-{}"} \textcolor{MidnightBlue}{\emph{1*}}HEXDIG\textbf{)} \textbf{]}\\
 \\
-\textbf{prose-val}\mbox{~~~~~~}\textbf{=}\mbox{~~}\textcolor{BrickRed}{"\textless{}"} \textcolor{MidnightBlue}{\emph{*}}\textbf{(}\textcolor{Brown}{\textbf{\%{}x}20\textbf{-}3D} \textbf{/} \textcolor{Brown}{\textbf{\%{}x}3F\textbf{-}7E}\textbf{)} \textcolor{BrickRed}{"\textgreater{}"}\\
+\textbf{prose-{}val}\mbox{~~~~~~}\textbf{=}\mbox{~~}\textcolor{BrickRed}{"\textless{}"} \textcolor{MidnightBlue}{\emph{*}}\textbf{(}\textcolor{Brown}{\textbf{\%{}x}20\textbf{-}3D} \textbf{/} \textcolor{Brown}{\textbf{\%{}x}3F\textbf{-}7E}\textbf{)} \textcolor{BrickRed}{"\textgreater{}"}\\
 \mbox{~~~~~~~~~~~~~~~~~~~~~~~}\textcolor{Gray}{; bracketed string of SP and VCHAR}\\
 \mbox{~~~~~~~~~~~~~~~~~~~~~~~}\textcolor{Gray}{;\mbox{~~}without angles}\\
 \mbox{~~~~~~~~~~~~~~~~~~~~~~~}\textcolor{Gray}{; prose description, to be used as}\\
