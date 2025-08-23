@@ -1,0 +1,34 @@
+\documentclass{article}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{courier}
+\usepackage{parskip}
+\begin{document}
+{\footnotesize\ttfamily
+\textbf{postal-address}\textbf{=}name-part street zip-part\\
+\\
+\textbf{name-part}\textbf{=}\textcolor{MidnightBlue}{\emph{*}}\textbf{(}personal-part SP\textbf{)} last-name\textbf{[}SP suffix\textbf{]} CRLF\\
+\\
+\textbf{name-part}\textbf{=/}personal-part CRLF\\
+\\
+\textbf{personal-part}\textbf{=}first-name\textbf{/}\textbf{(}initial\textcolor{BrickRed}{"."}\textbf{)}\\
+\\
+\textbf{first-name}\textbf{=}\textcolor{MidnightBlue}{\emph{*}}ALPHA\\
+\\
+\textbf{initial}\textbf{=}ALPHA\\
+\\
+\textbf{last-name}\textbf{=}\textcolor{MidnightBlue}{\emph{*}}ALPHA\\
+\\
+\textbf{suffix}\textbf{=}\textbf{(}\textcolor{BrickRed}{"Jr."}\textbf{/}\textcolor{BrickRed}{"Sr."}\textbf{/}\textcolor{MidnightBlue}{\emph{1*}}\textbf{(}\textcolor{BrickRed}{"I"}\textbf{/}\textcolor{BrickRed}{"V"}\textbf{/}\textcolor{BrickRed}{"X"}\textbf{)}\textbf{)}\\
+\\
+\textbf{street}\textbf{=}\textbf{[}apt SP\textbf{]} house-num SP street-name CRLF\\
+\\
+\textbf{apt}\textbf{=}\textcolor{MidnightBlue}{\emph{1*4}}DIGIT\\
+\\
+\textbf{house-num}\textbf{=}\textcolor{MidnightBlue}{\emph{1*8}}\textbf{(}DIGIT\textbf{/}ALPHA\textbf{)}\\
+\\
+\textbf{street-name}\textbf{=}\textcolor{MidnightBlue}{\emph{1*}}VCHAR\\
+\\
+\textbf{zip-part}\textbf{=}town-name\textcolor{BrickRed}{","}SP state \textcolor{MidnightBlue}{\emph{1*2}}SP zip-code CRLF\\
+\\
+
+}\end{document}

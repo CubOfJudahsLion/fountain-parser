@@ -298,6 +298,10 @@ comment = do
 commentOrNewline :: ReadP [ParseTree]
 commentOrNewline = comment +++ (singleton <$> newline)
 
+--  Reads a comment, a newline, or eof
+commentOrNewlineOrEof :: ReadP [ParseTree]
+commentOrNewlineOrEof = commentOrNewline <++ ([] <$ eof)
+
 --  Comment or whitespace separating parts of a single definition
 commentOrWhitespace :: ReadP [ParseTree]
 commentOrWhitespace =   (singleton <$> whitespace)
@@ -353,9 +357,9 @@ concatenation = do
     repetitionSingleton :: ReadP [ParseTree]
     repetitionSingleton = singleton <$> repetition
     --
-    --  Gets another repetition preceded by comments or whitespaces
+    --  Gets another repetition preceded by optional comments or whitespaces
     separatedRepetition :: ReadP [ParseTree]
-    separatedRepetition = (++) <$> commentsOrWhitespaces True <*> repetitionSingleton
+    separatedRepetition = (++) <$> commentsOrWhitespaces False <*> repetitionSingleton
 
 --  Parses a single alternation operator
 alternationOperator :: ReadP ParseTree
@@ -418,15 +422,15 @@ rule = do
   lhs <- rulename
   definedAsElems <- definedAs
   rhsElems <- elements
-  separator <- commentOrNewline
+  separator <- commentOrNewlineOrEof
   pure $ Rule lhs (definedAsElems ++ rhsElems ++ separator)
 
 --  Parses a set of rules (the entire file)
 rulelist :: ReadP ParseTree
-rulelist =    Rulelist . concat
-         <$>  maxMany1
-                 (   (singleton <$> rule)
-                 +++ ((++) <$> commentsOrWhitespaces False <*> commentOrNewline))
+rulelist  =   Rulelist . concat
+          <$> maxMany1
+                (   (singleton <$> rule)
+                +++ ((++) <$> commentsOrWhitespaces False <*> commentOrNewline))
 
 
 ----------------------------------------
@@ -467,7 +471,7 @@ instance DocumentRepresentable RepetitionBounds where
       (?\) :: Monoid m => m -> m
       (?\) = let ?keep = prettyPrint in condVal
     in
-      (?\) "\\textcolor{RoyalBlue}{\\emph{" ++ docRep' bounds ++ (?\) "}}"
+      (?\) "\\textcolor{MidnightBlue}{\\emph{" ++ docRep' bounds ++ (?\) "}}"
     where
       docRep' :: RepetitionBounds -> String
       docRep' (RepsCount count)       = count
@@ -509,7 +513,7 @@ instance DocumentRepresentable ParseTree where
         (RuleDefinitionOperator op)       ->  (?\) "\\textbf{" ++ op ++ (?\) "}"
         (RuleDefinition trees)            ->  docRep prettyPrint trees
         (Rule name trees)                 ->  (?\) "\\textbf{" ++ docRep prettyPrint name ++ (?\) "}" ++ docRep prettyPrint trees
-        (Rulelist trees)                  ->  (?\) "{\\scriptsize\\ttfamily\n" ++ docRep prettyPrint trees ++ (?\) "}"
+        (Rulelist trees)                  ->  (?\) "{\\footnotesize\\ttfamily\n" ++ docRep prettyPrint trees ++ (?\) "\n}"
     where
       --  Converts a single character into a LaTeX escape sequence, if any
       charAsLaTeX :: Char -> String

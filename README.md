@@ -41,7 +41,7 @@ different Fountain entities even as it uses different parsing methods.
 
 `fountain-parser` aims to power a series of command-line utilities for
 conversion from <span style="font-variant: small-caps">Fountain</span> to a series of
-convenient formats, (`.OTF`, `.TEX`) without intervention from thirds.
+convenient formats (like `.TEX`) without intervention from thirds.
 
 ## My software already supports Fountain
 
