@@ -83,12 +83,14 @@ compound documents such as production bibles.
       those, thus it might be desirable to preserve them.
   \end{itemize}
 
-  \subsection*{Tentative Formal Grammar}
+  \subsection*{Tentative Grammar}
   The following is an attempt to formalize the syntax in
   \href{https://datatracker.ietf.org/doc/html/rfc5234}{\textsc{ABNF}},
   drawing from the \href{https://fountain.io/syntax/}{syntax guide} and
-  \textsc{Objective~C} implementation.  It incorporates \textsc{Unicode}
-  codepoints and it tries to err in the side of lenience.
+  \textsc{Objective~C}
+  \link{https://github.com/nyousefi/Fountain}{implementation}.
+  It incorporates \textsc{Unicode} codepoints and tries to err in the
+  side of lenience.
   
   \input{./grammar.tex}
 
@@ -98,10 +100,9 @@ compile and run the test suite (once implemented.)
 
 The project uses the \texttt{GHC2021} language default. While it might
 be possible to compile it in earlier versions than 9.6.7, this default
-is only available since 9.2.1., so that constitutes a hard version limit
-for those who want to try other versions.
+is only available since 9.2.1, constituting a hard limit.
 
-Some of the included scripts require \texttt{make}, \texttt{awk} and
+Some of the included scripts require \texttt{make}, \texttt{sed} and
 other similar utilities usually found in \textsc{Linux} or
 \textsc{Linux}-like environments (e.g.,
 \link{https://www.msys2.org/}{\textsc{MSYS2}}.) However, nothing
@@ -115,7 +116,7 @@ if you find a bug.
 
 I can be reached directly at
 \textrm{\emph{10951848+C\"{u}b\b{O}fJ\'{u}d\~{a}hsL\^{i}\`{o}n} \u{a}(t)
-\emph{users/noreply/g\={i}th\d{u}b/c\.{o}m}} (without accents and
+\emph{users/noreply/g\={i}th\d{u}b/c\.{o}m}} (without diacritics and
 replacing slashes by periods.)
 
 \end{document}

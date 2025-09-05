@@ -1,53 +1,52 @@
 #! /usr/bin/env runhaskell
-{-
-  ABNF2LATEX
+--  ABNF2LATEX
+--
+--  Copyright (c) 2025 Alexander Feterman Naranjo
+--
+--  Redistribution and use in source and binary forms, with or without modification, are
+--  permitted provided that the following conditions are met:
+--
+--  1. Redistributions of source code must retain the above copyright notice, this list of
+--  conditions and the following disclaimer.
+--
+--  2. Redistributions in binary form must reproduce the above copyright notice, this list of
+--  conditions and the following disclaimer in the documentation and/or other materials
+--  provided with the distribution.
+--
+--  3. Neither the name of the copyright holder nor the names of its contributors may be used to
+--  endorse or promote products derived from this software without specific prior written
+--  permission.
+--
+--  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS “AS IS” AND ANY
+--  EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+--  MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+--  COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+--  EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+--  SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+--  HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
+--  TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+--  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+--
+--  ----
+--
+--  This is a script using GHC's builtin-in parser to pretty-print an ABNF file (as defined by
+--  RFCs 5234 (https://www.rfc-editor.org/rfc/rfc5234) and 7405
+--  (https://www.rfc-editor.org/rfc/rfc7405) into a LaTeX fragment.
+--
+--  Written mostly for fun. One doesn't really have to parse something to pretty-print it in
+--  most cases.
+--
+--  The RFCs directly provide the parsing scheme, though this parser is slightly more flexible:
+--  it doesn't require spacing between elements or a newline after the final rule.
+--  Nevertheless, the implementation remains much improvable: to begin with, because of size,
+--  this probably should be a project on its own, and a better parsing library could be used.
+--
+--  The including document must use the following packages:
+--    - xcolor package with the dvipsnames option.
+--    - courier or any other package that allows bold teletype
 
-  Copyright (c) 2025 Alexander Feterman Naranjo
-
-  Redistribution and use in source and binary forms, with or without modification, are
-  permitted provided that the following conditions are met:
-  
-  1. Redistributions of source code must retain the above copyright notice, this list of
-  conditions and the following disclaimer.
-  
-  2. Redistributions in binary form must reproduce the above copyright notice, this list of
-  conditions and the following disclaimer in the documentation and/or other materials
-  provided with the distribution.
-  
-  3. Neither the name of the copyright holder nor the names of its contributors may be used to
-  endorse or promote products derived from this software without specific prior written
-  permission.
-  
-  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS “AS IS” AND ANY
-  EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
-  MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-  COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
-  EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-  SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
-  HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
-  TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
-
-  ----
-
-  This is a script using GHC's builtin-in parser to pretty-print an ABNF file (as defined by
-  RFCs 5234 (https://www.rfc-editor.org/rfc/rfc5234) and 7405
-  (https://www.rfc-editor.org/rfc/rfc7405) into a LaTeX fragment.
-
-  Written mostly for fun. One doesn't really have to parse something to pretty-print it in
-  most cases.
-
-  The RFCs directly provide the parsing scheme, though this parser is slightly more flexible:
-  it doesn't require spacing between elements or a newline after the final rule.
-  Nevertheless, the implementation remains much improvable: to begin with, because of size,
-  this probably should be a project on its own, and a better parsing library could be used.
-
-  The including document must use the following packages:
-    - xcolor package with the dvipsnames option.
-    - courier or any other package that allows bold teletype
--}
-
-{-# OPTIONS_GHC -XGHC2021 #-}
+{-# OPTIONS_GHC -XHaskell2010 #-}
+{-# LANGUAGE BangPatterns #-}
 module Main (main) where
 
 ----------------------------------------
@@ -58,11 +57,11 @@ import Control.Monad ( void )
 import Data.Char ( isAlpha, isDigit, isHexDigit, isPrint )
 import Data.Foldable ( foldl' )
 import Data.Kind ( Type )
-import Data.List ( foldl1', intercalate, singleton, uncons )
+import Data.List ( foldl1', intercalate, singleton )
 import Data.Maybe ( fromMaybe )
 import System.Environment ( getArgs )
 import System.Exit ( die )
-import System.IO ( stdin, stdout, openFile, hClose, hGetContents', hPutStr, IOMode(ReadMode, WriteMode) )
+import System.IO ( IOMode(ReadMode, WriteMode), hClose, hGetContents', hPutStr, openFile, stdin, stdout )
 import Text.ParserCombinators.ReadP
 
 
@@ -70,13 +69,13 @@ import Text.ParserCombinators.ReadP
 -- Parsing data structures
 ----------------------------------------
 
---  Numeric bases used in numeric strings
+--  Numeric bases used in hex char strings
 data NumValBase = Hex !Char
                 | Dec !Char
                 | Bin !Char
   deriving (Eq, Show)
 
---  Case sensitivity specificier for strings (when absent, strings are case insensitive)
+--  Case sensitivity specificier for double-quoted string literals (when absent, strings are case insensitive)
 data CaseSensitivity  = CaseSensitive !Char
                       | CaseInsensitive !Char
                       | ImplicitCaseInsensitive
@@ -94,7 +93,7 @@ data RepetitionBounds = RepsCount !String                         -- A specific 
   deriving (Eq, Show)
 
 
---  Simple tree representation of the ABNF document
+--  Very simple tree representation of the ABNF document. Nearly no semantics -- just meant to make prettyprinting easy.
 data ParseTree  = CharVal !CaseSensitivity !String          -- String as a double-quoted [multi]-character value
                 | NumValSingle !NumValBase !String          -- String as a single number preceded by regex %[bdc]
                 | NumValRange !NumValBase !String !String   -- String as a range (%[bdc] followed by two dash-separated numbers)
@@ -152,7 +151,7 @@ spaceAccumulate :: SpaceAccum -> ParseTree -> (Maybe ParseTree, SpaceAccum)
 spaceAccumulate NoSpaces tree                         =
   case parseTreeToSpaceAccum tree of
     NoSpaces  -> (Just tree, NoSpaces)
-    accum     -> (Nothing, accum)    
+    accum     -> (Nothing, accum)
 spaceAccumulate (SingleSpace s) (Whitespace w)        = (Nothing, MultipleSpaces $ s : expandSpace w)
 spaceAccumulate (SingleSpace s) (Whitespaces ws)      = (Nothing, MultipleSpaces $ s : concatMap expandSpace ws)
 spaceAccumulate (MultipleSpaces ss) (Whitespace w)    = (Nothing, MultipleSpaces $ ss ++ expandSpace w)
@@ -438,7 +437,6 @@ rulelist  =   Rulelist . concat
 --  This is a class of elements that can be represented on a document
 class DocumentRepresentable d where
   --  Produce a String from the representable.
-  --  The Bool specifies where pretty-printing should be used or not
   docRep :: d -> String
 
 --  Automatic instance: any array of representables is representable itself
@@ -473,7 +471,7 @@ instance DocumentRepresentable CaseSensitivity where
   docRep (CaseSensitive c)        = "\\textbf{\\%{}" ++ c : "}"
 
 
---  Returns parse trees to String form, whether for prettyprinting or as raw text.
+--  Returns parse trees as Strings with LaTeX formatting
 instance DocumentRepresentable ParseTree where
   docRep tree = case tree of
     (CharVal caseSensitivity str)     ->  "\\textcolor{BrickRed}{" ++ docRep caseSensitivity ++ '"' : stringAsLaTeX str ++ '"' : "}"
@@ -522,17 +520,21 @@ instance DocumentRepresentable ParseTree where
 
 
 --  Processes the file. If successful, LaTeX prettyprinting codes are returned.
---  Otherwise, an error message is produced.
+--  Otherwise, an error message with a line number (and an optional column) is produced.
 processABNF :: String -> Either String String
 processABNF source =
   case readP_to_S rulelist source of
-    []        ->  Left "Parsing error in line 1"
-    parsings  ->  let (lenUnparsed, tree, unparsed) = foldl1' longestParse $ addLength <$> parsings
+    []        ->  --  Parser couldn't even start
+                  Left "Parsing error in line 1"
+    parsings  ->  --  Choose the parser that processed the most of the source
+                  let (lenUnparsed, tree, unparsed) = foldl1' longestParse $ addLength <$> parsings
                   in  if lenUnparsed == 0
                         then
+                          --  If it's all processed, pretty-print the parse tree and return it
                           Right $ docRep tree
                         else
-                          let (line, col) = lineCol $ take (length source - lenUnparsed) source
+                          --  Otherwise, use what was processed to find a line and column for the error report
+                          let (line, col) = lineCol $ flip take source $ length source - lenUnparsed
                           in  Left $ "Parsing error in line " ++ show line ++ ", column " ++ show col
   where
     --  Adds the length of the unparsed string to a (tree, unparsed) pair
@@ -548,12 +550,12 @@ processABNF source =
     lineCol = lineColWorker (1, 1)
       where
         lineColWorker :: (Int, Int) -> String -> (Int, Int)
-        lineColWorker lineCol ""                        = lineCol
-        lineColWorker (line, col) ('\r' : '\n' : rest)  = lineColWorker (line + 1, 1)       rest
-        lineColWorker (line, col) ('\n' : '\r' : rest)  = lineColWorker (line + 1, 1)       rest
-        lineColWorker (line, col) ('\r' : rest)         = lineColWorker (line + 1, 1)       rest
-        lineColWorker (line, col) ('\n' : rest)         = lineColWorker (line + 1, 1)       rest
-        lineColWorker (line, col) (_    : rest)         = lineColWorker (line,     col + 1) rest
+        lineColWorker !lineCol ""                         = lineCol
+        lineColWorker (!line, _)    ('\r' : '\n' : rest)  = lineColWorker (line + 1, 1)       rest
+        lineColWorker (!line, _)    ('\r' : rest)         = lineColWorker (line + 1, 1)       rest
+        lineColWorker (!line, _)    ('\n' : '\r' : rest)  = lineColWorker (line + 1, 1)       rest
+        lineColWorker (!line, _)    ('\n' : rest)         = lineColWorker (line + 1, 1)       rest
+        lineColWorker (!line, !col) (_    : rest)         = lineColWorker (line,     col + 1) rest
 
 
 ----------------------------------------

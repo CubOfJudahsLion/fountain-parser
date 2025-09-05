@@ -84,14 +84,15 @@ such as production bibles.
   Some possible conversion targets have equivalents to those, thus it
   might be desirable to preserve them.
 
-## Tentative Formal Grammar
+## Tentative Grammar
 
 The following is an attempt to formalize the syntax in
 [<span style="font-variant: small-caps">ABNF</span>](https://datatracker.ietf.org/doc/html/rfc5234),
 drawing from the [syntax guide](https://fountain.io/syntax/) and
-<span style="font-variant: small-caps">Objective C</span> implementation. It
-incorporates <span style="font-variant: small-caps">Unicode</span> codepoints and it
-tries to err in the side of lenience.
+<span style="font-variant: small-caps">Objective C</span>
+<u>[implementation](https://github.com/nyousefi/Fountain)</u>. It
+incorporates <span style="font-variant: small-caps">Unicode</span> codepoints and tries
+to err in the side of lenience.
 
 ``` abnf
 ;; The grammar is currently ambiguous, requiring unrestricted lookahead or backtracking.
@@ -186,10 +187,9 @@ compile and run the test suite (once implemented.)
 
 The project uses the `GHC2021` language default. While it might be
 possible to compile it in earlier versions than 9.6.7, this default is
-only available since 9.2.1., so that constitutes a hard version limit
-for those who want to try other versions.
+only available since 9.2.1, constituting a hard limit.
 
-Some of the included scripts require `make`, `awk` and other similar
+Some of the included scripts require `make`, `sed` and other similar
 utilities usually found in <span style="font-variant: small-caps">Linux</span> or
 <span style="font-variant: small-caps">Linux</span>-like environments (e.g.,
 <u>[<span style="font-variant: small-caps">MSYS2</span>](https://www.msys2.org/)</u>.)
@@ -204,5 +204,5 @@ you find a bug.
 
 I can be reached directly at
 <span style="font-family: serif">*10951848+CübO̱fJúdãhsLîòn* ă(t)
-*users/noreply/gīthụb/cȯm*</span> (without accents and replacing slashes
-by periods.)
+*users/noreply/gīthụb/cȯm*</span> (without diacritics and replacing
+slashes by periods.)
