@@ -2,4 +2,6 @@
 \usepackage[dvipsnames]{xcolor}
 \usepackage{courier}
 \usepackage{parskip}
+\usepackage{relsize}
+\renewcommand{\textsuperscript}[1]{\raisebox{0.8ex}{#1}}
 \begin{document}

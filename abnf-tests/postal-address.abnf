@@ -24,8 +24,8 @@ street-name=1*VCHAR
 
 zip-part=town-name","SP state 1*2SP zip-code CRLF
 
-town-name=1∗(ALPHA/SP)
+town-name=1*(ALPHA/SP)
 
 state=2ALPHA
 
-zip-code=5DIGIT["−"4DIGIT]
+zip-code=5DIGIT["-"4DIGIT]

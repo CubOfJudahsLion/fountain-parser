@@ -2,33 +2,40 @@
 \usepackage[dvipsnames]{xcolor}
 \usepackage{courier}
 \usepackage{parskip}
+\usepackage{relsize}
+\renewcommand{\textsuperscript}[1]{\raisebox{0.8ex}{#1}}
 \begin{document}
-{\footnotesize\ttfamily
-\textbf{postal-{}address}\textbf{=}name-{}part street zip-{}part\\
+{\scriptsize\ttfamily
+\emph{postal-{}address}\textbf{=}\emph{name-{}part} \emph{street} \emph{zip-{}part}\\
 \\
-\textbf{name-{}part}\textbf{=}\textcolor{MidnightBlue}{\emph{*}}\textbf{(}personal-{}part SP\textbf{)} last-{}name\textbf{[}SP suffix\textbf{]} CRLF\\
+\emph{name-{}part}\textbf{=}\textcolor{teal}{\emph{\textsuperscript{*}}}\textbf{(}\emph{personal-{}part} \emph{SP}\textbf{)} \emph{last-{}name}\textbf{[}\emph{SP} \emph{suffix}\textbf{]} \emph{CRLF}\\
 \\
-\textbf{name-{}part}\textbf{=/}personal-{}part CRLF\\
+\emph{name-{}part}\textbf{=/}\emph{personal-{}part} \emph{CRLF}\\
 \\
-\textbf{personal-{}part}\textbf{=}first-{}name\textbf{/}\textbf{(}initial\textcolor{BrickRed}{"."}\textbf{)}\\
+\emph{personal-{}part}\textbf{=}\emph{first-{}name}\textbf{/}\textbf{(}\emph{initial}\textcolor{BrickRed}{"."}\textbf{)}\\
 \\
-\textbf{first-{}name}\textbf{=}\textcolor{MidnightBlue}{\emph{*}}ALPHA\\
+\emph{first-{}name}\textbf{=}\textcolor{teal}{\emph{\textsuperscript{*}}}\emph{ALPHA}\\
 \\
-\textbf{initial}\textbf{=}ALPHA\\
+\emph{initial}\textbf{=}\emph{ALPHA}\\
 \\
-\textbf{last-{}name}\textbf{=}\textcolor{MidnightBlue}{\emph{*}}ALPHA\\
+\emph{last-{}name}\textbf{=}\textcolor{teal}{\emph{\textsuperscript{*}}}\emph{ALPHA}\\
 \\
-\textbf{suffix}\textbf{=}\textbf{(}\textcolor{BrickRed}{"Jr."}\textbf{/}\textcolor{BrickRed}{"Sr."}\textbf{/}\textcolor{MidnightBlue}{\emph{1*}}\textbf{(}\textcolor{BrickRed}{"I"}\textbf{/}\textcolor{BrickRed}{"V"}\textbf{/}\textcolor{BrickRed}{"X"}\textbf{)}\textbf{)}\\
+\emph{suffix}\textbf{=}\textbf{(}\textcolor{BrickRed}{"Jr."}\textbf{/}\textcolor{BrickRed}{"Sr."}\textbf{/}\textcolor{teal}{\emph{\textsuperscript{1*}}}\textbf{(}\textcolor{BrickRed}{"I"}\textbf{/}\textcolor{BrickRed}{"V"}\textbf{/}\textcolor{BrickRed}{"X"}\textbf{)}\textbf{)}\\
 \\
-\textbf{street}\textbf{=}\textbf{[}apt SP\textbf{]} house-{}num SP street-{}name CRLF\\
+\emph{street}\textbf{=}\textbf{[}\emph{apt} \emph{SP}\textbf{]} \emph{house-{}num} \emph{SP} \emph{street-{}name} \emph{CRLF}\\
 \\
-\textbf{apt}\textbf{=}\textcolor{MidnightBlue}{\emph{1*4}}DIGIT\\
+\emph{apt}\textbf{=}\textcolor{teal}{\emph{\textsuperscript{1*4}}}\emph{DIGIT}\\
 \\
-\textbf{house-{}num}\textbf{=}\textcolor{MidnightBlue}{\emph{1*8}}\textbf{(}DIGIT\textbf{/}ALPHA\textbf{)}\\
+\emph{house-{}num}\textbf{=}\textcolor{teal}{\emph{\textsuperscript{1*8}}}\textbf{(}\emph{DIGIT}\textbf{/}\emph{ALPHA}\textbf{)}\\
 \\
-\textbf{street-{}name}\textbf{=}\textcolor{MidnightBlue}{\emph{1*}}VCHAR\\
+\emph{street-{}name}\textbf{=}\textcolor{teal}{\emph{\textsuperscript{1*}}}\emph{VCHAR}\\
 \\
-\textbf{zip-{}part}\textbf{=}town-{}name\textcolor{BrickRed}{","}SP state \textcolor{MidnightBlue}{\emph{1*2}}SP zip-{}code CRLF\\
+\emph{zip-{}part}\textbf{=}\emph{town-{}name}\textcolor{BrickRed}{","}\emph{SP} \emph{state} \textcolor{teal}{\emph{\textsuperscript{1*2}}}\emph{SP} \emph{zip-{}code} \emph{CRLF}\\
 \\
+\emph{town-{}name}\textbf{=}\textcolor{teal}{\emph{\textsuperscript{1*}}}\textbf{(}\emph{ALPHA}\textbf{/}\emph{SP}\textbf{)}\\
+\\
+\emph{state}\textbf{=}\textcolor{teal}{\emph{\textsuperscript{2}}}\emph{ALPHA}\\
+\\
+\emph{zip-{}code}\textbf{=}\textcolor{teal}{\emph{\textsuperscript{5}}}\emph{DIGIT}\textbf{[}\textcolor{BrickRed}{"-{}"}\textcolor{teal}{\emph{\textsuperscript{4}}}\emph{DIGIT}\textbf{]}\\
 
 }\end{document}

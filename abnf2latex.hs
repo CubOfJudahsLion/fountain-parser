@@ -34,14 +34,14 @@
 --  (https://www.rfc-editor.org/rfc/rfc7405) into a LaTeX fragment.
 --
 --  Written mostly for fun. One doesn't really have to parse something to pretty-print it in
---  most cases.
+--  most cases. Then again, tree-sitting is all the rage these days.
 --
 --  The RFCs directly provide the parsing scheme, though this parser is slightly more flexible:
 --  it doesn't require spacing between elements or a newline after the final rule.
 --  Nevertheless, the implementation remains much improvable: to begin with, because of size,
 --  this probably should be a project on its own, and a better parsing library could be used.
 --
---  The including document must use the following packages:
+--  abnf2latex generates a _fragment_. The including document must use the following packages:
 --    - xcolor package with the dvipsnames option.
 --    - courier or any other package that allows bold teletype
 
@@ -457,7 +457,7 @@ baseLetter (Bin c)  = c
 
 --  Repetition bound specifications have document representations
 instance DocumentRepresentable RepetitionBounds where
-  docRep bounds = "\\textcolor{teal}{\\emph{" ++ docRep' bounds ++ "}}"
+  docRep bounds = "\\textcolor{teal}{\\emph{\\textsuperscript{" ++ docRep' bounds ++ "}}}"
     where
       docRep' :: RepetitionBounds -> String
       docRep' (RepsCount count)       = count
@@ -494,7 +494,7 @@ instance DocumentRepresentable ParseTree where
     (RuleDefinitionOperator op)       ->  "\\textbf{" ++ op ++ "}"
     (RuleDefinition trees)            ->  docRep trees
     (Rule name trees)                 ->  docRep name ++ docRep trees
-    (Rulelist trees)                  ->  "{\\footnotesize\\ttfamily\n" ++ docRep trees ++ "\n}"
+    (Rulelist trees)                  ->  "{\\scriptsize\\ttfamily\n" ++ docRep trees ++ "\n}"
     where
       --  Common LaTeX prelude for all num-vals
       numValPrelude :: String

@@ -7,6 +7,8 @@
 \usepackage{parskip}
 \usepackage[margin=2cm]{geometry}
 \usepackage{courier}
+\usepackage{relsize}
+\renewcommand{\textsuperscript}[1]{\raisebox{0.8ex}{#1}}
 
 \begin{document}
 \title{fountain-parser v.0.1.0.0 README}
@@ -92,7 +94,7 @@ compound documents such as production bibles.
   It incorporates \textsc{Unicode} codepoints and tries to err in the
   side of lenience.
   
-  \input{./grammar.tex}
+  \input{./fountain-grammar.tex}
 
 \section*{Building}
 \textsc{GHC} 9.6.7 and \textsc{Cabal} 3.0 (or greater) are required to

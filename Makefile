@@ -6,7 +6,7 @@
 
 .ONESHELL: README.md
 
-README_SOURCES = README.tex grammar.tex
+README_SOURCES = README.tex fountain-grammar.tex
 
 all: readmes
 
@@ -29,8 +29,8 @@ README.md: $(README_SOURCES)
 	-re 's/<span class="roman">/<span style="font-family: serif">/g' \
 	> README.md
 
-grammar.tex: grammar.abnf abnf2latex.hs
-	./abnf2latex.hs grammar.abnf > grammar.tex
+fountain-grammar.tex: fountain-grammar.abnf abnf2latex.hs
+	./abnf2latex.hs fountain-grammar.abnf > fountain-grammar.tex
 
 test:
 	cabal test

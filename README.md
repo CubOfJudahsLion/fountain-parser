@@ -94,90 +94,163 @@ drawing from the [syntax guide](https://fountain.io/syntax/) and
 incorporates <span style="font-variant: small-caps">Unicode</span> codepoints and tries
 to err in the side of lenience.
 
-``` abnf
-;; The grammar is currently ambiguous, requiring unrestricted lookahead or backtracking.
-;; The "maximal-munch" rule applies: the longest match is considered the valid one.
-
-;; Some character will be described as regular expressions character classes inside prose
-;; values (i.e., <[...]>) as it's more concise than enumerating a lot of character ranges.
-;; \uxxx... (unicode character in hex), \p{...}/\P{...} (having/not-having Unicode
-;; property) and [:defined-set:] notations will be used.
-
-
-fountain-screenplay = *empty-line [cover-page] script-content
-
-cover-page = 1*cover-entry
-
-cover-entry = cover-key ":" *space cover-value
-
-cover-key = 1*<[^:[:newline-char:]]>  ; later trimmed of end spaces
-
-cover-value = single-value / multi-value
-
-single-value = 1*non-newline
-
-multi-value = 1*(newline 1*space 1*non-newline)
-
-script-content = *(section-indicator / master-scene / synopse)
-
-section-indicator = 1*"#" *space 1*non-newline newline empty-line
-
-master-scene = master-scene-heading scene-content
-
-master-scene-heading = int-ext scene-description *scene-number *space newline empty-line
-
-int-ext = ("I" (["."] "/" ["E"] / ("NT" ["."] "/EXT")) / "E" ["XT"]) ("." / space)
-
-scene-description = *space 1*non-newline-or-hash
-
-scene-number = "#" 1*scene-number-character "#" *space
-
-scene-number-character = alphanumeric / "-" / "."
-
-
-heading = 1*"#" *space 
-
-power-action-line = "!" *<[^!\n]> "\n"
-
-power-character-line = "@" 1*<[^[:newline-char:](]> ["(" <[^[:newline-char:])]> ")"] *space ["^" *space]
-
-;power-scene-header-line = 
-
-
-
-vtab = %x0B
-
-ff = %x0C
-
-newline = CR [LF]
-        / LF [CR]
-        / vtab    ; We interpret vertical tabbing as a newline too
-        / ff      ; Same for form-feeds
-        / %x0085  ; Unicode next-line
-        / %x2028  ; Unicode line-separator
-        / %x2029  ; Unicode paragraph-separator
-        ; These are all converted into your OS's native newline at the end.
-
-newline-char  = CR / LF / vtab / ff / %x0085 / %x2028 / %x2029 ; characters used in the former
-
-space = SP          ; normal space
-      / HTAB        ; tabulator -- converts into 4 spaces
-      / %x00A0      ; non-breaking
-      / %x2000-2009 ; varying-width Em/En-based spaces
-      / %x202F      ; narrow non-breaking
-      / %x205F      ; mathematical middle-space
-      / %x3000      ; Ideographic space
-      ; These are turned into one or more fixed-width spaces (SP); we're trying to imitate
-      ; a typewriter.
-      ; Hairline or zero-width spaces and joiners are removed previous to parsing.
-      ; Same goes for any control characters not listed as space or newline.
-
-non-newline = <re:[^[:newline-char:]]>
-
-non-newline-or-hash = <re:[^[:newline-char:]#]>
-
-
-```
+<span style="color: gray">;; The grammar is currently ambiguous,
+requiring unrestricted lookahead or backtracking.</span>  
+<span style="color: gray">;; The "maximal-munch" rule applies: the
+longest match is considered the valid one.</span>  
+  
+<span style="color: gray">;; Some character will be described as regular
+expressions character classes inside prose</span>  
+<span style="color: gray">;; values (i.e., \<\[...\]\>) as it's more
+concise than enumerating a lot of character ranges.</span>  
+<span style="color: gray">;; \uxxx... (unicode character in hex),
+\p{...}/\P{...} (having/not-having Unicode</span>  
+<span style="color: gray">;; property) and \[:defined-set:\] notations
+will be used.</span>  
+  
+  
+*fountain-screenplay* **=**
+<span style="color: teal"></span>*empty-line* **\[***cover-page***\]**
+*script-content*  
+  
+*cover-page* **=** <span style="color: teal"></span>*cover-entry*  
+  
+*cover-entry* **=** *cover-key* <span style="color: BrickRed">":"</span>
+<span style="color: teal"></span>*space* *cover-value*  
+  
+*cover-key* **=**
+<span style="color: teal"></span>**\<**<span style="color: olive">\[^:\[:newline-char:\]\]</span>**\>**  <span style="color: gray">;
+later trimmed of end spaces</span>  
+  
+*cover-value* **=** *single-value* **/** *multi-value*  
+  
+*single-value* **=** <span style="color: teal"></span>*non-newline*  
+  
+*multi-value* **=** <span style="color: teal"></span>**(***newline*
+<span style="color: teal"></span>*space*
+<span style="color: teal"></span>*non-newline***)**  
+  
+*script-content* **=**
+<span style="color: teal"></span>**(***section-indicator* **/**
+*master-scene* **/** *synopse***)**  
+  
+*section-indicator* **=**
+<span style="color: teal"></span><span style="color: BrickRed">"#"</span>
+<span style="color: teal"></span>*space*
+<span style="color: teal"></span>*non-newline* *newline* *empty-line*  
+  
+*master-scene* **=** *master-scene-heading* *scene-content*  
+  
+*master-scene-heading* **=** *int-ext* *scene-description*
+<span style="color: teal"></span>*scene-number*
+<span style="color: teal"></span>*space* *newline* *empty-line*  
+  
+*int-ext* **=** **(**<span style="color: BrickRed">"I"</span>
+**(\[**<span style="color: BrickRed">"."</span>**\]**
+<span style="color: BrickRed">"/"</span>
+**\[**<span style="color: BrickRed">"E"</span>**\]** **/**
+**(**<span style="color: BrickRed">"NT"</span>
+**\[**<span style="color: BrickRed">"."</span>**\]**
+<span style="color: BrickRed">"/EXT"</span>**))** **/**
+<span style="color: BrickRed">"E"</span>
+**\[**<span style="color: BrickRed">"XT"</span>**\])**
+**(**<span style="color: BrickRed">"."</span> **/** *space***)**  
+  
+*scene-description* **=** <span style="color: teal"></span>*space*
+<span style="color: teal"></span>*non-newline-or-hash*  
+  
+*scene-number* **=** <span style="color: BrickRed">"#"</span>
+<span style="color: teal"></span>*scene-number-character*
+<span style="color: BrickRed">"#"</span>
+<span style="color: teal"></span>*space*  
+  
+*scene-number-character* **=** *alphanumeric* **/**
+<span style="color: BrickRed">"-"</span> **/**
+<span style="color: BrickRed">"."</span>  
+  
+  
+*heading* **=**
+<span style="color: teal"></span><span style="color: BrickRed">"#"</span>
+<span style="color: teal"></span>*space*  
+  
+*power-action-line* **=** <span style="color: BrickRed">"!"</span>
+<span style="color: teal"></span>**\<**<span style="color: olive">\[^!\n\]</span>**\>**
+<span style="color: BrickRed">"\n"</span>  
+  
+*power-character-line* **=** <span style="color: BrickRed">"@"</span>
+<span style="color: teal"></span>**\<**<span style="color: olive">\[^\[:newline-char:\](\]</span>**\>**
+**\[**<span style="color: BrickRed">"("</span>
+**\<**<span style="color: olive">\[^\[:newline-char:\])\]</span>**\>**
+<span style="color: BrickRed">")"</span>**\]**
+<span style="color: teal"></span>*space*
+**\[**<span style="color: BrickRed">"^"</span>
+<span style="color: teal"></span>*space***\]**  
+  
+<span style="color: gray">;power-scene-header-line = </span>  
+  
+  
+  
+*vtab* **=** <span style="color: Brown">**%x**0B</span>  
+  
+*ff* **=** <span style="color: Brown">**%x**0C</span>  
+  
+*newline* **=** *CR* **\[***LF***\]**  
+        **/** *LF* **\[***CR***\]**  
+        **/** *vtab*    <span style="color: gray">; We interpret
+vertical tabbing as a newline too</span>  
+        **/** *ff*      <span style="color: gray">; Same for
+form-feeds</span>  
+        **/**
+<span style="color: Brown">**%x**0085</span>  <span style="color: gray">;
+Unicode next-line</span>  
+        **/**
+<span style="color: Brown">**%x**2028</span>  <span style="color: gray">;
+Unicode line-separator</span>  
+        **/**
+<span style="color: Brown">**%x**2029</span>  <span style="color: gray">;
+Unicode paragraph-separator</span>  
+        <span style="color: gray">; These are all converted into your
+OS's native newline at the end.</span>  
+  
+*newline-char*  **=** *CR* **/** *LF* **/** *vtab* **/** *ff* **/**
+<span style="color: Brown">**%x**0085</span> **/**
+<span style="color: Brown">**%x**2028</span> **/**
+<span style="color: Brown">**%x**2029</span> <span style="color: gray">;
+characters used in the former</span>  
+  
+*space* **=** *SP*          <span style="color: gray">; normal
+space</span>  
+      **/** *HTAB*        <span style="color: gray">; tabulator --
+converts into 4 spaces</span>  
+      **/**
+<span style="color: Brown">**%x**00A0</span>      <span style="color: gray">;
+non-breaking</span>  
+      **/** <span style="color: Brown">**%x**2000**-**2009</span>
+<span style="color: gray">; varying-width Em/En-based spaces</span>  
+      **/**
+<span style="color: Brown">**%x**202F</span>      <span style="color: gray">;
+narrow non-breaking</span>  
+      **/**
+<span style="color: Brown">**%x**205F</span>      <span style="color: gray">;
+mathematical middle-space</span>  
+      **/**
+<span style="color: Brown">**%x**3000</span>      <span style="color: gray">;
+Ideographic space</span>  
+      <span style="color: gray">; These are turned into one or more
+fixed-width spaces (SP); we're trying to imitate</span>  
+      <span style="color: gray">; a typewriter.</span>  
+      <span style="color: gray">; Hairline or zero-width spaces and
+joiners are removed previous to parsing.</span>  
+      <span style="color: gray">; Same goes for any control characters
+not listed as space or newline.</span>  
+  
+*non-newline* **=**
+**\<**<span style="color: olive">re:\[^\[:newline-char:\]\]</span>**\>**  
+  
+*non-newline-or-hash* **=**
+**\<**<span style="color: olive">re:\[^\[:newline-char:\]#\]</span>**\>**  
+  
+  
 
 # Building
 
