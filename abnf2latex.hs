@@ -48,7 +48,6 @@
 -}
 
 {-# OPTIONS_GHC -XGHC2021 #-}
-{-# LANGUAGE ImplicitParams #-}
 module Main (main) where
 
 ----------------------------------------
@@ -77,7 +76,7 @@ data NumValBase = Hex !Char
                 | Bin !Char
   deriving (Eq, Show)
 
---  Whether 
+--  Case sensitivity specificier for strings (when absent, strings are case insensitive)
 data CaseSensitivity  = CaseSensitive !Char
                       | CaseInsensitive !Char
                       | ImplicitCaseInsensitive
@@ -97,12 +96,12 @@ data RepetitionBounds = RepsCount !String                         -- A specific 
 
 --  Simple tree representation of the ABNF document
 data ParseTree  = CharVal !CaseSensitivity !String          -- String as a double-quoted [multi]-character value
-                | NumValSingle !NumValBase !String          -- String as a single number preceded by %[bdc]
+                | NumValSingle !NumValBase !String          -- String as a single number preceded by regex %[bdc]
                 | NumValRange !NumValBase !String !String   -- String as a range (%[bdc] followed by two dash-separated numbers)
                 | NumValSequence !NumValBase ![String]      -- String as a sequence (%[bdc] followed by multiple dot-separated numbers)
                 | Prose !String                             -- A prose value (between angle brackets)
                 | Rulename !String                          -- Name of a rule, started by an alpha and followed by dashes, alphas and digits
-                | Newline !String                           -- ("\n" ["\r"] | "\r" ["\n"])
+                | Newline !String                           -- Newline, preserving sequence (\n\r?|\r\n?)
                 | Whitespace !Char                          -- Any single whitespace character, " " or "\t"
                 | Whitespaces !String                       -- A string of 2 or more whitespaces, with tabs replaced by a number of spaces
                 | Printable !String                         -- A string of printable (non-whitespace, non-ln) characters with no inherent markup
@@ -129,12 +128,12 @@ data SpaceAccum = NoSpaces
                 | SingleSpace !Char
                 | MultipleSpaces !String
 
--- Expands characters to singleton strings, or in the case of \t, into four characters
+--  Expands characters to singleton strings, or in the case of \t, into four characters
 expandSpace :: Char -> String
 expandSpace '\t'  = replicate 4 ' ' -- Hardcoded rule, for now: a tab equates four spaces
 expandSpace c     = singleton c
 
--- Converts the space accumulator into an empty list or single-ParseTree list
+--  Converts the space accumulator into an empty list or single-ParseTree list
 spaceAccumToParseTrees :: SpaceAccum -> [ParseTree]
 spaceAccumToParseTrees NoSpaces             = []
 spaceAccumToParseTrees (SingleSpace s)      = [Whitespace s]
@@ -148,7 +147,7 @@ parseTreeToSpaceAccum (Whitespaces ws)  = MultipleSpaces $ concatMap expandSpace
 parseTreeToSpaceAccum _                 = NoSpaces
 
 --  Accumulates the next parse tree into an existing space accumulator.
---  If it doesn't accumulate, it returns Left fwith 
+--  Returns a pair: (token if it doesn't contain spaces, space accumulator)
 spaceAccumulate :: SpaceAccum -> ParseTree -> (Maybe ParseTree, SpaceAccum)
 spaceAccumulate NoSpaces tree                         =
   case parseTreeToSpaceAccum tree of
@@ -160,11 +159,11 @@ spaceAccumulate (MultipleSpaces ss) (Whitespace w)    = (Nothing, MultipleSpaces
 spaceAccumulate (MultipleSpaces ss) (Whitespaces ws)  = (Nothing, MultipleSpaces $ ss ++ concatMap expandSpace ws)
 spaceAccumulate spaceAccum tree                       = (Just tree, spaceAccum)
 
---  Collapses multiple spaces into a single entity
+--  Collapses multiple spaces into a single entity in a parse tree, returning a new optimized tree.
 collapseSpaces :: [ParseTree] -> [ParseTree]
 collapseSpaces = collapse' id NoSpaces
   where
-    -- Working function (tail-recursive)
+    --  Working function (tail-recursive) with differential list as accumulator.
     collapse' :: ([ParseTree] -> [ParseTree]) -> SpaceAccum -> [ParseTree] -> [ParseTree]
     collapse' accumFn spaceAccum []           = accumFn $ spaceAccumToParseTrees spaceAccum
     collapse' accumFn spaceAccum trees@(t:ts) =
@@ -179,7 +178,7 @@ collapseSpaces = collapse' id NoSpaces
 
 
 ----------------------------------------
---  Parsing optimization
+--  Parsing optimizations
 ----------------------------------------
 
 --  many and many1 produce mutiple possible parsings, which is
@@ -191,7 +190,6 @@ maxMany p = do
   if null parsed
     then pure []
     else (++) <$> pure parsed <*> maxMany p
-  --(((++) . singleton <$> p) <++ pure []) <*> maxMany p
 maxMany1 p = do
   parsed <- maxMany p
   if null parsed
@@ -203,7 +201,7 @@ maxMany1 p = do
 --  Parsing routines
 ----------------------------------------
 
---  Reads a possibly implicit case sensitivity (before double-quoted strings)
+--  Reads a possibly implicit case sensitivity (preceding double-quoted strings)
 caseSensitivity :: ReadP CaseSensitivity
 caseSensitivity =   (   char '%'
                     *>  (   (CaseInsensitive <$> satisfy (`elem` ['i', 'I']))
@@ -482,9 +480,9 @@ instance DocumentRepresentable ParseTree where
     (NumValSingle base digits)        ->  numValPrelude ++ baseLetter base : "}" ++ digits ++ "}"
     (NumValRange base start end)      ->  numValPrelude ++ baseLetter base : "}" ++ start ++ "\\textbf{" ++ '-' : "}" ++ end ++ "}"
     (NumValSequence base digitGroups) ->  numValPrelude ++ baseLetter base : "}" ++ intercalate ("\\textbf{" ++ '.' : "}") digitGroups ++ "}"
-    (Prose prose)                     ->  '<' : "\\emph{" ++ stringAsLaTeX prose ++ "}" ++ ">"
-    (Rulename name)                   ->  stringAsLaTeX name
-    (Whitespace w)                    ->  [w]
+    (Prose prose)                     ->  '<' : "\\textcolor{blue}{" ++ stringAsLaTeX prose ++ "}" ++ ">"
+    (Rulename name)                   ->  "\\emph{" ++ stringAsLaTeX name ++ "}"
+    (Whitespace w)                    ->  singleton w
     (Whitespaces ws)                  ->  "\\mbox{" ++ fmap (const '~') ws ++ "}"
     (Printable s)                     ->  stringAsLaTeX s
     (Comment tree)                    ->  "\\textcolor{Gray}{" ++ ';' : docRep tree ++ "}"
@@ -497,7 +495,7 @@ instance DocumentRepresentable ParseTree where
     (Option trees)                    ->  "\\textbf{" ++ '[' : "}" ++ docRep trees ++ "\\textbf{" ++ ']' : "}"
     (RuleDefinitionOperator op)       ->  "\\textbf{" ++ op ++ "}"
     (RuleDefinition trees)            ->  docRep trees
-    (Rule name trees)                 ->  "\\textbf{" ++ docRep name ++ "}" ++ docRep trees
+    (Rule name trees)                 ->  docRep name ++ docRep trees
     (Rulelist trees)                  ->  "{\\footnotesize\\ttfamily\n" ++ docRep trees ++ "\n}"
     where
       --  Common LaTeX prelude for all num-vals
@@ -524,10 +522,38 @@ instance DocumentRepresentable ParseTree where
 
 
 --  Processes the file. If successful, LaTeX prettyprinting codes are returned.
---  Otherwise, Nothing is produced. The parser might produce multiple parsings,
---  so  we'll use the longest (last.)
-processABNF :: String -> Maybe String
-processABNF = fmap (docRep . fst . fst) . uncons . reverse . readP_to_S rulelist
+--  Otherwise, an error message is produced.
+processABNF :: String -> Either String String
+processABNF source =
+  case readP_to_S rulelist source of
+    []        ->  Left "Parsing error in line 1"
+    parsings  ->  let (lenUnparsed, tree, unparsed) = foldl' longestParse $ addLength <$> parsings
+                  in  if lenUnparsed == 0
+                        then
+                          Right $ docRep tree
+                        else
+                          let (line, col) = lineCol $ take (length source - lenUnparsed) source
+                          in  Left $ "Parsing error in line " ++ show line ++ ", column " ++ show col
+  where
+    --  Adds the length of the unparsed string to a (tree, unparsed) pair
+    addLength :: (ParseTree, String) -> (Int, ParseTree, String)
+    addLength (tree, unparsed) = (length unparsed, tree, unparsed)
+    --
+    --  Chooses the longest parse (with the least unparsed source)
+    longestParse :: (Int, ParseTree, String) -> (Int, ParseTree, String) -> (Int, ParseTree, String)
+    longestParse a@(lenA, _, _) b@(lenB, _, _) = if lenA < lenB then a else b
+    --
+    --  Obtains the last (line, col) position of a text
+    lineCol :: String -> (Int, Int)
+    lineCol = lineColWorker (1, 1)
+      where
+        lineColWorker :: (Int, Int) -> String -> (Int, Int)
+        lineColWorker lineCol "" = lineCol
+        lineColWorker ('\r' : '\n' : rest) (line, col) = lineColWorker rest (line + 1, 1)
+        lineColWorker ('\n' : '\r' : rest) (line, col) = lineColWorker rest (line + 1, 1)
+        lineColWorker ('\r' : rest)        (line, col) = lineColWorker rest (line + 1, 1)
+        lineColWorker ('\n' : rest)        (line, col) = lineColWorker rest (line + 1, 1)
+        lineColWorker (_    : rest)        (line, col) = lineColWorker rest (line,     col + 1)
 
 
 ----------------------------------------
@@ -559,8 +585,8 @@ main = do
     InFile  -> hClose inputHandle
   -- Parse and convert to pretty-printed text
   case processABNF contents of
-    Nothing     -> die $ "Parsing error"
-    Just parsed -> do
+    Left err      -> die err
+    Right parsed  -> do
       -- Obtain output type and handle
       (outputType, outputHandle) <-
         if length args < 2
