@@ -18,11 +18,11 @@ README.pdf: $(README_SOURCES)
 
 README.md: $(README_SOURCES)
 	# Remove
-	sed -re 's|^[[:blank:]]*\\input\{\./grammar.tex\}.*$$|-=grammar.abnf=-|' README.tex \
+	sed -re 's|^[[:blank:]]*\\input\{\./fountain-grammar\.tex\}.*$$|-=fountain-grammar.abnf=-|' README.tex \
 	| pandoc -f latex -t gfm --strip-comments --standalone \
-	| sed -re '/-=grammar\.abnf=-/ {
+	| sed -re '/-=fountain-grammar\.abnf=-/ {
 	s/^.*$$/``` abnf/
-	rgrammar.abnf
+	rfountain-grammar.abnf
 	a```
 	}' \
 	-re 's/<span class="smallcaps">/<span style="font-variant: small-caps">/g' \
