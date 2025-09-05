@@ -44,7 +44,7 @@ power-action-line = "!" *<[^!\n]> "\n"
 
 power-character-line = "@" 1*<[^[:newline-char:](]> ["(" <[^[:newline-char:])]> ")"] *space ["^" *space]
 
-power-scene-header-line = 
+;power-scene-header-line = 
 
 
 

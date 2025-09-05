@@ -58,7 +58,7 @@ import Control.Monad ( void )
 import Data.Char ( isAlpha, isDigit, isHexDigit, isPrint )
 import Data.Foldable ( foldl' )
 import Data.Kind ( Type )
-import Data.List ( intercalate, singleton, uncons )
+import Data.List ( foldl1', intercalate, singleton, uncons )
 import Data.Maybe ( fromMaybe )
 import System.Environment ( getArgs )
 import System.Exit ( die )
@@ -447,7 +447,7 @@ instance (DocumentRepresentable d) => DocumentRepresentable [d] where
 
 
 ----------------------------------------
---  Prettyprinting
+--  Pretty-printing
 ----------------------------------------
 
 --  Revert the bases to their respective letter
@@ -459,7 +459,7 @@ baseLetter (Bin c)  = c
 
 --  Repetition bound specifications have document representations
 instance DocumentRepresentable RepetitionBounds where
-  docRep bounds = "\\textcolor{MidnightBlue}{\\emph{" ++ docRep' bounds ++ "}}"
+  docRep bounds = "\\textcolor{teal}{\\emph{" ++ docRep' bounds ++ "}}"
     where
       docRep' :: RepetitionBounds -> String
       docRep' (RepsCount count)       = count
@@ -480,12 +480,12 @@ instance DocumentRepresentable ParseTree where
     (NumValSingle base digits)        ->  numValPrelude ++ baseLetter base : "}" ++ digits ++ "}"
     (NumValRange base start end)      ->  numValPrelude ++ baseLetter base : "}" ++ start ++ "\\textbf{" ++ '-' : "}" ++ end ++ "}"
     (NumValSequence base digitGroups) ->  numValPrelude ++ baseLetter base : "}" ++ intercalate ("\\textbf{" ++ '.' : "}") digitGroups ++ "}"
-    (Prose prose)                     ->  '<' : "\\textcolor{blue}{" ++ stringAsLaTeX prose ++ "}" ++ ">"
+    (Prose prose)                     ->  "\\textbf{\\textless}" ++ "\\textcolor{olive}{" ++ stringAsLaTeX prose ++ "}" ++ "\\textbf{\\textgreater}"
     (Rulename name)                   ->  "\\emph{" ++ stringAsLaTeX name ++ "}"
     (Whitespace w)                    ->  singleton w
     (Whitespaces ws)                  ->  "\\mbox{" ++ fmap (const '~') ws ++ "}"
     (Printable s)                     ->  stringAsLaTeX s
-    (Comment tree)                    ->  "\\textcolor{Gray}{" ++ ';' : docRep tree ++ "}"
+    (Comment tree)                    ->  "\\textcolor{gray}{" ++ ';' : docRep tree ++ "}"
     (Newline nl)                      ->  "\\\\" ++ nl
     (Repetition bounds element)       ->  docRep bounds ++ docRep element
     (Concatenation trees)             ->  docRep trees
@@ -527,7 +527,7 @@ processABNF :: String -> Either String String
 processABNF source =
   case readP_to_S rulelist source of
     []        ->  Left "Parsing error in line 1"
-    parsings  ->  let (lenUnparsed, tree, unparsed) = foldl' longestParse $ addLength <$> parsings
+    parsings  ->  let (lenUnparsed, tree, unparsed) = foldl1' longestParse $ addLength <$> parsings
                   in  if lenUnparsed == 0
                         then
                           Right $ docRep tree
@@ -548,12 +548,12 @@ processABNF source =
     lineCol = lineColWorker (1, 1)
       where
         lineColWorker :: (Int, Int) -> String -> (Int, Int)
-        lineColWorker lineCol "" = lineCol
-        lineColWorker ('\r' : '\n' : rest) (line, col) = lineColWorker rest (line + 1, 1)
-        lineColWorker ('\n' : '\r' : rest) (line, col) = lineColWorker rest (line + 1, 1)
-        lineColWorker ('\r' : rest)        (line, col) = lineColWorker rest (line + 1, 1)
-        lineColWorker ('\n' : rest)        (line, col) = lineColWorker rest (line + 1, 1)
-        lineColWorker (_    : rest)        (line, col) = lineColWorker rest (line,     col + 1)
+        lineColWorker lineCol ""                        = lineCol
+        lineColWorker (line, col) ('\r' : '\n' : rest)  = lineColWorker (line + 1, 1)       rest
+        lineColWorker (line, col) ('\n' : '\r' : rest)  = lineColWorker (line + 1, 1)       rest
+        lineColWorker (line, col) ('\r' : rest)         = lineColWorker (line + 1, 1)       rest
+        lineColWorker (line, col) ('\n' : rest)         = lineColWorker (line + 1, 1)       rest
+        lineColWorker (line, col) (_    : rest)         = lineColWorker (line,     col + 1) rest
 
 
 ----------------------------------------
