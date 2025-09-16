@@ -8,6 +8,8 @@
 
 README_SOURCES = README.tex fountain-grammar.tex
 
+HASKELL_SOURCES = $(shell find ./src -iname \*.hs -print)
+
 all: readmes
 
 readmes: README.pdf README.md
@@ -41,6 +43,6 @@ doc:
 cleanup:
 	cabal clean
 	-@rm README.{aux,log,md,out,pdf}
-	-@rm grammar.tex
+	-@rm fountain-grammar.tex
 	find . \( -name \*\~ -o -name \#\*\# -o -iname \*.sw\? \) -delete
 

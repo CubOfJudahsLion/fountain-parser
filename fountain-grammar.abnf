@@ -1,50 +1,112 @@
 ;; The grammar is currently ambiguous, requiring unrestricted lookahead or backtracking.
 ;; The "maximal-munch" rule applies: the longest match is considered the valid one.
 
-;; Some character will be described as regular expressions character classes inside prose
-;; values (i.e., <[...]>) as it's more concise than enumerating a lot of character ranges.
-;; \uxxx... (unicode character in hex), \p{...}/\P{...} (having/not-having Unicode
-;; property) and [:defined-set:] notations will be used.
+;; Some characters will be described as regular expressions character classes inside prose
+;; values (i.e., <regex:...>) as it's more concise than enumerating multiple character
+;; ranges; \p{...}/\P{...} (having/not-having Unicode property) and [:defined-set:] notations
+;; will be used as well.  The <lookahead:...> expression is self-explanatory.
 
 
-fountain-screenplay = *empty-line [cover-page] script-content
+fountain-screenplay = [cover-page] script-content
+
+empty-line = newline ; leading spacing will be considered later
 
 cover-page = 1*cover-entry
 
-cover-entry = cover-key ":" *space cover-value
+cover-entry = cover-key ":" *space cover-value newline
 
-cover-key = 1*<[^:[:newline-char:]]>  ; later trimmed of end spaces
+; For the cover-key, the values ("TITLE" / "CREDIT" / "AUTHOR" / "SOURCE" / "DRAFT" 1*SPACE "DATE" / "CONTACT") are
+; printed in the cover page. Any other keys are regarded as metadata and ignored.
+cover-key = 1*<regex:[^:[:newline-char:]]>
 
+; A cover value follows on the same line, or has multiple indented lines starting below the cover key.
 cover-value = single-value / multi-value
 
+; Single value follows right after the colon
 single-value = 1*non-newline
 
+; Multi-values are preceded by newlines and spaces
 multi-value = 1*(newline 1*space 1*non-newline)
 
-script-content = *(section-indicator / master-scene / synopse)
+; At the highest level, a script can have sections, synopses, transitions and scene headers... or
+; at least that's the theory. In practice, some authors include bits of prose and scene contents
+; (i.e., action and dialogue) before the first explicit scene header, as if there was an
+; implicit first scene. Thus the script content begins, by default, at the zeroth scene and the
+; zero-level section (which emcompasses the whole document and all sections.)
+script-content = *script-element
 
-section-indicator = 1*"#" *space 1*non-newline newline empty-line
+; Some script elements need no preceding lines...
+script-element =  section / synopse / scene-content
 
-master-scene = master-scene-heading scene-content
+; ...but can have them, and others do need them.
+script-element =/ 1*emptyline (section / synopse / transition / scene / scene-content)
 
-master-scene-heading = int-ext scene-description *scene-number *space newline empty-line
+; The section indicator starts with one or more hashes, indicating section hierarchy
+; with the number of hashes. Thus, the highest explicitly declared section level in the
+; hierarchy is level one, always under zero. The section encompasses all content below
+; until the next section markup.
+section = 1*"#" *space 1*non-newline newline <lookahead: empty-line>
 
-int-ext = ("I" (["."] "/" ["E"] / ("NT" ["."] "/EXT")) / "E" ["XT"]) ("." / space)
+; A synopse is a single line starting with an equals sign.
+synopse = "=" *non-newline newline
 
-scene-description = *space 1*non-newline-or-hash
+; Transitions begin with ">" or are all uppercase and end in "TO:"
+transition = (forced-transition / uppercase-transition / common-transition) newline <lookahead: empty-line>
 
+; If it begins with ">", we need to make sure it doesn't end in "<" as that's centered text
+forced-transition = ">" 1*<regex:[^[:newline-char:]<]>
+
+; Uppercase transitions are all uppercase end in "TO:"
+uppercase-transition = 1*<regex:[^\p{Ll}[:newline-char:]]> 1*space %s"TO" *space ":" *space
+
+; Some extra patterns that represent transitions, such as cuts, dissolves and fades (including
+; "fade in" and "fade out" at the beginning/end of the script.) Allow periods, colon and
+; ellipses at the end of such sentences.
+common-transition = (fade-transition / cut-dissolve-transition) *space [("." [".."] / ":") *space]
+
+fade-transition = "FADE" 1*space ("IN" / "OUT" / "TO")
+
+cut-dissolve-transition = ("CUT" / "DISSOLVE") 1*space "TO"
+
+; A scene has a heading and content
+scene = scene-heading scene-content
+
+; The heading is either a forced scene (starting with ".") or starts with INT/EXT/EST combinations.
+; Includes a description and an optional scene number, followed by an empty line.
+scene-heading = ("." / int-ext) scene-description [scene-number] newline <lookahead: empty-line>
+
+; Scenes might beging with I[NT] or E[ST/XT]
+int-ext = inte / esxt
+
+inte = "I" ("/E" int-ext-ender / "." ("/E" int-ext-ender / *space) / nte)
+
+int-ext-ender = "." *space / 1*space
+
+nte = "NT" ("/EXT" int-ext-ender / "." ("/EXT" int-ext-ender / *space))
+
+esxt = "E" ["ST" / "XT"] int-ext-ender
+
+; Scene descriptions are merely prose. Note hashes are not excluded as there might be
+; numbered characters or props, even if a scene-number might follow. This is handled
+; with lookahead.
+scene-description = 1*<regex:[^[:newline-char:]]>
+
+; Scene numbers admit alphanumerics, dashes and periods, surrounded by hashes.
 scene-number = "#" 1*scene-number-character "#" *space
 
 scene-number-character = alphanumeric / "-" / "."
 
 
-heading = 1*"#" *space 
 
-power-action-line = "!" *<[^!\n]> "\n"
 
-power-character-line = "@" 1*<[^[:newline-char:](]> ["(" <[^[:newline-char:])]> ")"] *space ["^" *space]
 
-;power-scene-header-line = 
+
+;;; 
+;;heading = 1*"#" *space *<regex:[^[:newline-char:]]>
+;;
+;;power-action-line = "!" *<regex:[^!\n]> "\n"
+;;
+;;power-character-line = "@" 1*<regex:[^[:newline-char:](]> ["(" <regex:[^[:newline-char:])]> ")"] *space ["^" *space]
 
 
 
@@ -75,8 +137,13 @@ space = SP          ; normal space
       ; Hairline or zero-width spaces and joiners are removed previous to parsing.
       ; Same goes for any control characters not listed as space or newline.
 
-non-newline = <re:[^[:newline-char:]]>
+alpha = <regex:[\p{L}]>
 
-non-newline-or-hash = <re:[^[:newline-char:]#]>
+numeric = <regex:[\p{N}]>
 
+alphanumeric = alpha / numeric
+
+non-newline = <regex:[^[:newline-char:]]>
+
+non-newline-or-hash = <regex:[^[:newline-char:]#]>
 
