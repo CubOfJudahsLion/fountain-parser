@@ -6,61 +6,61 @@
 \renewcommand{\textsuperscript}[1]{\raisebox{0.8ex}{#1}}
 \begin{document}
 {\scriptsize\ttfamily
-\emph{rulelist}\mbox{~~~~~~~}\textbf{=}\mbox{~~}\textcolor{teal}{\emph{\textsuperscript{1*}}}\textbf{(} \emph{rule} \textbf{/} \textbf{(}\textcolor{teal}{\emph{\textsuperscript{*}}}\emph{c-{}wsp} \emph{c-{}nl}\textbf{)} \textbf{)}\\
+\emph{rulelist}\mbox{~~~~~~~}\textbf{=}\mbox{~~}\textcolor{teal}{\emph{1\textbf{*}}}\textbf{(} \emph{rule} \textbf{/} \textbf{(}\textcolor{teal}{\emph{\textbf{*}}}\emph{c-{}wsp} \emph{c-{}nl}\textbf{)} \textbf{)}\\
 \\
 \emph{rule}\mbox{~~~~~~~~~~~}\textbf{=}\mbox{~~}\emph{rulename} \emph{defined-{}as} \emph{elements} \emph{c-{}nl}\\
 \mbox{~~~~~~~~~~~~~~~~~~~~~~~}\textcolor{gray}{; continues if next line starts}\\
 \mbox{~~~~~~~~~~~~~~~~~~~~~~~}\textcolor{gray}{;\mbox{~~}with white space}\\
 \\
-\emph{rulename}\mbox{~~~~~~~}\textbf{=}\mbox{~~}\emph{ALPHA} \textcolor{teal}{\emph{\textsuperscript{*}}}\textbf{(}\emph{ALPHA} \textbf{/} \emph{DIGIT} \textbf{/} \textcolor{BrickRed}{"-{}"}\textbf{)}\\
+\emph{rulename}\mbox{~~~~~~~}\textbf{=}\mbox{~~}\emph{ALPHA} \textcolor{teal}{\emph{\textbf{*}}}\textbf{(}\emph{ALPHA} \textbf{/} \emph{DIGIT} \textbf{/} \textcolor{BrickRed}{"-{}"}\textbf{)}\\
 \\
-\emph{defined-{}as}\mbox{~~~~~}\textbf{=}\mbox{~~}\textcolor{teal}{\emph{\textsuperscript{*}}}\emph{c-{}wsp} \textbf{(}\textcolor{BrickRed}{"="} \textbf{/} \textcolor{BrickRed}{"=/"}\textbf{)} \textcolor{teal}{\emph{\textsuperscript{*}}}\emph{c-{}wsp}\\
+\emph{defined-{}as}\mbox{~~~~~}\textbf{=}\mbox{~~}\textcolor{teal}{\emph{\textbf{*}}}\emph{c-{}wsp} \textbf{(}\textcolor{BrickRed}{"="} \textbf{/} \textcolor{BrickRed}{"=/"}\textbf{)} \textcolor{teal}{\emph{\textbf{*}}}\emph{c-{}wsp}\\
 \mbox{~~~~~~~~~~~~~~~~~~~~~~~}\textcolor{gray}{; basic rules definition and}\\
 \mbox{~~~~~~~~~~~~~~~~~~~~~~~}\textcolor{gray}{;\mbox{~~}incremental alternatives}\\
 \\
-\emph{elements}\mbox{~~~~~~~}\textbf{=}\mbox{~~}\emph{alternation} \textcolor{teal}{\emph{\textsuperscript{*}}}\emph{c-{}wsp}\\
+\emph{elements}\mbox{~~~~~~~}\textbf{=}\mbox{~~}\emph{alternation} \textcolor{teal}{\emph{\textbf{*}}}\emph{c-{}wsp}\\
 \\
 \emph{c-{}wsp}\mbox{~~~~~~~~~~}\textbf{=}\mbox{~~}\emph{WSP} \textbf{/} \textbf{(}\emph{c-{}nl} \emph{WSP}\textbf{)}\\
 \\
 \emph{c-{}nl}\mbox{~~~~~~~~~~~}\textbf{=}\mbox{~~}\emph{comment} \textbf{/} \emph{CRLF}\\
 \mbox{~~~~~~~~~~~~~~~~~~~~~~~}\textcolor{gray}{; comment or newline}\\
 \\
-\emph{comment}\mbox{~~~~~~~~}\textbf{=}\mbox{~~}\textcolor{BrickRed}{";"} \textcolor{teal}{\emph{\textsuperscript{*}}}\textbf{(}\emph{WSP} \textbf{/} \emph{VCHAR}\textbf{)} \emph{CRLF}\\
+\emph{comment}\mbox{~~~~~~~~}\textbf{=}\mbox{~~}\textcolor{BrickRed}{";"} \textcolor{teal}{\emph{\textbf{*}}}\textbf{(}\emph{WSP} \textbf{/} \emph{VCHAR}\textbf{)} \emph{CRLF}\\
 \\
 \emph{alternation}\mbox{~~~~}\textbf{=}\mbox{~~}\emph{concatenation}\\
-\mbox{~~~~~~~~~~~~~~~~~~}\textcolor{teal}{\emph{\textsuperscript{*}}}\textbf{(}\textcolor{teal}{\emph{\textsuperscript{*}}}\emph{c-{}wsp} \textcolor{BrickRed}{"/"} \textcolor{teal}{\emph{\textsuperscript{*}}}\emph{c-{}wsp} \emph{concatenation}\textbf{)}\\
+\mbox{~~~~~~~~~~~~~~~~~~}\textcolor{teal}{\emph{\textbf{*}}}\textbf{(}\textcolor{teal}{\emph{\textbf{*}}}\emph{c-{}wsp} \textcolor{BrickRed}{"/"} \textcolor{teal}{\emph{\textbf{*}}}\emph{c-{}wsp} \emph{concatenation}\textbf{)}\\
 \\
-\emph{concatenation}\mbox{~~}\textbf{=}\mbox{~~}\emph{repetition} \textcolor{teal}{\emph{\textsuperscript{*}}}\textbf{(}\textcolor{teal}{\emph{\textsuperscript{1*}}}\emph{c-{}wsp} \emph{repetition}\textbf{)}\\
+\emph{concatenation}\mbox{~~}\textbf{=}\mbox{~~}\emph{repetition} \textcolor{teal}{\emph{\textbf{*}}}\textbf{(}\textcolor{teal}{\emph{1\textbf{*}}}\emph{c-{}wsp} \emph{repetition}\textbf{)}\\
 \\
 \emph{repetition}\mbox{~~~~~}\textbf{=}\mbox{~~}\textbf{[}\emph{repeat}\textbf{]} \emph{element}\\
 \\
-\emph{repeat}\mbox{~~~~~~~~~}\textbf{=}\mbox{~~}\textcolor{teal}{\emph{\textsuperscript{1*}}}\emph{DIGIT} \textbf{/} \textbf{(}\textcolor{teal}{\emph{\textsuperscript{*}}}\emph{DIGIT} \textcolor{BrickRed}{"*"} \textcolor{teal}{\emph{\textsuperscript{*}}}\emph{DIGIT}\textbf{)}\\
+\emph{repeat}\mbox{~~~~~~~~~}\textbf{=}\mbox{~~}\textcolor{teal}{\emph{1\textbf{*}}}\emph{DIGIT} \textbf{/} \textbf{(}\textcolor{teal}{\emph{\textbf{*}}}\emph{DIGIT} \textcolor{BrickRed}{"*"} \textcolor{teal}{\emph{\textbf{*}}}\emph{DIGIT}\textbf{)}\\
 \\
 \emph{element}\mbox{~~~~~~~~}\textbf{=}\mbox{~~}\emph{rulename} \textbf{/} \emph{group} \textbf{/} \emph{option} \textbf{/}\\
 \mbox{~~~~~~~~~~~~~~~~~~}\emph{char-{}val} \textbf{/} \emph{num-{}val} \textbf{/} \emph{prose-{}val}\\
 \\
-\emph{group}\mbox{~~~~~~~~~~}\textbf{=}\mbox{~~}\textcolor{BrickRed}{"("} \textcolor{teal}{\emph{\textsuperscript{*}}}\emph{c-{}wsp} \emph{alternation} \textcolor{teal}{\emph{\textsuperscript{*}}}\emph{c-{}wsp} \textcolor{BrickRed}{")"}\\
+\emph{group}\mbox{~~~~~~~~~~}\textbf{=}\mbox{~~}\textcolor{BrickRed}{"("} \textcolor{teal}{\emph{\textbf{*}}}\emph{c-{}wsp} \emph{alternation} \textcolor{teal}{\emph{\textbf{*}}}\emph{c-{}wsp} \textcolor{BrickRed}{")"}\\
 \\
-\emph{option}\mbox{~~~~~~~~~}\textbf{=}\mbox{~~}\textcolor{BrickRed}{"["} \textcolor{teal}{\emph{\textsuperscript{*}}}\emph{c-{}wsp} \emph{alternation} \textcolor{teal}{\emph{\textsuperscript{*}}}\emph{c-{}wsp} \textcolor{BrickRed}{"]"}\\
+\emph{option}\mbox{~~~~~~~~~}\textbf{=}\mbox{~~}\textcolor{BrickRed}{"["} \textcolor{teal}{\emph{\textbf{*}}}\emph{c-{}wsp} \emph{alternation} \textcolor{teal}{\emph{\textbf{*}}}\emph{c-{}wsp} \textcolor{BrickRed}{"]"}\\
 \\
-\emph{char-{}val}\mbox{~~~~~~~}\textbf{=}\mbox{~~}\emph{DQUOTE} \textcolor{teal}{\emph{\textsuperscript{*}}}\textbf{(}\textcolor{Brown}{\textbf{\%{}x}20\textbf{-}21} \textbf{/} \textcolor{Brown}{\textbf{\%{}x}23\textbf{-}7E}\textbf{)} \emph{DQUOTE}\\
+\emph{char-{}val}\mbox{~~~~~~~}\textbf{=}\mbox{~~}\emph{DQUOTE} \textcolor{teal}{\emph{\textbf{*}}}\textbf{(}\textcolor{Brown}{\textbf{\%{}x}20\textbf{-}21} \textbf{/} \textcolor{Brown}{\textbf{\%{}x}23\textbf{-}7E}\textbf{)} \emph{DQUOTE}\\
 \mbox{~~~~~~~~~~~~~~~~~~~~~~~}\textcolor{gray}{; quoted string of SP and VCHAR}\\
 \mbox{~~~~~~~~~~~~~~~~~~~~~~~}\textcolor{gray}{;\mbox{~~}without DQUOTE}\\
 \\
 \emph{num-{}val}\mbox{~~~~~~~~}\textbf{=}\mbox{~~}\textcolor{BrickRed}{"\%{}"} \textbf{(}\emph{bin-{}val} \textbf{/} \emph{dec-{}val} \textbf{/} \emph{hex-{}val}\textbf{)}\\
 \\
-\emph{bin-{}val}\mbox{~~~~~~~~}\textbf{=}\mbox{~~}\textcolor{BrickRed}{"b"} \textcolor{teal}{\emph{\textsuperscript{1*}}}\emph{BIT}\\
-\mbox{~~~~~~~~~~~~~~~~~~}\textbf{[} \textcolor{teal}{\emph{\textsuperscript{1*}}}\textbf{(}\textcolor{BrickRed}{"."} \textcolor{teal}{\emph{\textsuperscript{1*}}}\emph{BIT}\textbf{)} \textbf{/} \textbf{(}\textcolor{BrickRed}{"-{}"} \textcolor{teal}{\emph{\textsuperscript{1*}}}\emph{BIT}\textbf{)} \textbf{]}\\
+\emph{bin-{}val}\mbox{~~~~~~~~}\textbf{=}\mbox{~~}\textcolor{BrickRed}{"b"} \textcolor{teal}{\emph{1\textbf{*}}}\emph{BIT}\\
+\mbox{~~~~~~~~~~~~~~~~~~}\textbf{[} \textcolor{teal}{\emph{1\textbf{*}}}\textbf{(}\textcolor{BrickRed}{"."} \textcolor{teal}{\emph{1\textbf{*}}}\emph{BIT}\textbf{)} \textbf{/} \textbf{(}\textcolor{BrickRed}{"-{}"} \textcolor{teal}{\emph{1\textbf{*}}}\emph{BIT}\textbf{)} \textbf{]}\\
 \mbox{~~~~~~~~~~~~~~~~~~~~~~~}\textcolor{gray}{; series of concatenated bit values}\\
 \mbox{~~~~~~~~~~~~~~~~~~~~~~~}\textcolor{gray}{;\mbox{~~}or single ONEOF range}\\
 \\
-\emph{dec-{}val}\mbox{~~~~~~~~}\textbf{=}\mbox{~~}\textcolor{BrickRed}{"d"} \textcolor{teal}{\emph{\textsuperscript{1*}}}\emph{DIGIT}\\
-\mbox{~~~~~~~~~~~~~~~~~~}\textbf{[} \textcolor{teal}{\emph{\textsuperscript{1*}}}\textbf{(}\textcolor{BrickRed}{"."} \textcolor{teal}{\emph{\textsuperscript{1*}}}\emph{DIGIT}\textbf{)} \textbf{/} \textbf{(}\textcolor{BrickRed}{"-{}"} \textcolor{teal}{\emph{\textsuperscript{1*}}}\emph{DIGIT}\textbf{)} \textbf{]}\\
+\emph{dec-{}val}\mbox{~~~~~~~~}\textbf{=}\mbox{~~}\textcolor{BrickRed}{"d"} \textcolor{teal}{\emph{1\textbf{*}}}\emph{DIGIT}\\
+\mbox{~~~~~~~~~~~~~~~~~~}\textbf{[} \textcolor{teal}{\emph{1\textbf{*}}}\textbf{(}\textcolor{BrickRed}{"."} \textcolor{teal}{\emph{1\textbf{*}}}\emph{DIGIT}\textbf{)} \textbf{/} \textbf{(}\textcolor{BrickRed}{"-{}"} \textcolor{teal}{\emph{1\textbf{*}}}\emph{DIGIT}\textbf{)} \textbf{]}\\
 \\
-\emph{hex-{}val}\mbox{~~~~~~~~}\textbf{=}\mbox{~~}\textcolor{BrickRed}{"x"} \textcolor{teal}{\emph{\textsuperscript{1*}}}\emph{HEXDIG}\\
-\mbox{~~~~~~~~~~~~~~~~~~}\textbf{[} \textcolor{teal}{\emph{\textsuperscript{1*}}}\textbf{(}\textcolor{BrickRed}{"."} \textcolor{teal}{\emph{\textsuperscript{1*}}}\emph{HEXDIG}\textbf{)} \textbf{/} \textbf{(}\textcolor{BrickRed}{"-{}"} \textcolor{teal}{\emph{\textsuperscript{1*}}}\emph{HEXDIG}\textbf{)} \textbf{]}\\
+\emph{hex-{}val}\mbox{~~~~~~~~}\textbf{=}\mbox{~~}\textcolor{BrickRed}{"x"} \textcolor{teal}{\emph{1\textbf{*}}}\emph{HEXDIG}\\
+\mbox{~~~~~~~~~~~~~~~~~~}\textbf{[} \textcolor{teal}{\emph{1\textbf{*}}}\textbf{(}\textcolor{BrickRed}{"."} \textcolor{teal}{\emph{1\textbf{*}}}\emph{HEXDIG}\textbf{)} \textbf{/} \textbf{(}\textcolor{BrickRed}{"-{}"} \textcolor{teal}{\emph{1\textbf{*}}}\emph{HEXDIG}\textbf{)} \textbf{]}\\
 \\
-\emph{prose-{}val}\mbox{~~~~~~}\textbf{=}\mbox{~~}\textcolor{BrickRed}{"\textless{}"} \textcolor{teal}{\emph{\textsuperscript{*}}}\textbf{(}\textcolor{Brown}{\textbf{\%{}x}20\textbf{-}3D} \textbf{/} \textcolor{Brown}{\textbf{\%{}x}3F\textbf{-}7E}\textbf{)} \textcolor{BrickRed}{"\textgreater{}"}\\
+\emph{prose-{}val}\mbox{~~~~~~}\textbf{=}\mbox{~~}\textcolor{BrickRed}{"<"} \textcolor{teal}{\emph{\textbf{*}}}\textbf{(}\textcolor{Brown}{\textbf{\%{}x}20\textbf{-}3D} \textbf{/} \textcolor{Brown}{\textbf{\%{}x}3F\textbf{-}7E}\textbf{)} \textcolor{BrickRed}{">"}\\
 \mbox{~~~~~~~~~~~~~~~~~~~~~~~}\textcolor{gray}{; bracketed string of SP and VCHAR}\\
 \mbox{~~~~~~~~~~~~~~~~~~~~~~~}\textcolor{gray}{;\mbox{~~}without angles}\\
 \mbox{~~~~~~~~~~~~~~~~~~~~~~~}\textcolor{gray}{; prose description, to be used as}\\

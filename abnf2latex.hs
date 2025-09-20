@@ -1,4 +1,5 @@
 #! /usr/bin/env runhaskell
+
 --  ABNF2LATEX
 --
 --  Copyright (c) 2025 Alexander Feterman Naranjo
@@ -45,9 +46,11 @@
 --    - xcolor package with the dvipsnames option.
 --    - courier or any other package that allows bold teletype
 
+
 {-# OPTIONS_GHC -XHaskell2010 #-}
 {-# LANGUAGE BangPatterns #-}
 module Main (main) where
+
 
 ----------------------------------------
 -- Imports
@@ -55,7 +58,8 @@ module Main (main) where
 
 import Control.Monad ( void )
 import Data.Char ( isAlpha, isDigit, isHexDigit, isPrint )
-import Data.Foldable ( foldl' )
+import Data.Foldable ( foldl', minimumBy )
+import Data.Function ( on )
 import Data.Kind ( Type )
 import Data.List ( foldl1', intercalate, singleton )
 import Data.Maybe ( fromMaybe )
@@ -144,6 +148,7 @@ parseTreeToSpaceAccum (Whitespace '\t') = MultipleSpaces $ expandSpace '\t'
 parseTreeToSpaceAccum (Whitespace w)    = SingleSpace w
 parseTreeToSpaceAccum (Whitespaces ws)  = MultipleSpaces $ concatMap expandSpace ws
 parseTreeToSpaceAccum _                 = NoSpaces
+
 
 --  Accumulates the next parse tree into an existing space accumulator.
 --  Returns a pair: (token if it doesn't contain spaces, space accumulator)
@@ -457,11 +462,11 @@ baseLetter (Bin c)  = c
 
 --  Repetition bound specifications have document representations
 instance DocumentRepresentable RepetitionBounds where
-  docRep bounds = "\\textcolor{teal}{\\emph{\\textsuperscript{" ++ docRep' bounds ++ "}}}"
+  docRep bounds = "\\textcolor{teal}{\\emph{" ++ docRep' bounds ++ "}}"
     where
       docRep' :: RepetitionBounds -> String
       docRep' (RepsCount count)       = count
-      docRep' (RepLimits lower upper) = fromMaybe "" lower ++ "*" ++ fromMaybe "" upper
+      docRep' (RepLimits lower upper) = fromMaybe "" lower ++ "\\textbf{*}" ++ fromMaybe "" upper
 
 
 --  Case insensitivity is also representable
@@ -478,7 +483,7 @@ instance DocumentRepresentable ParseTree where
     (NumValSingle base digits)        ->  numValPrelude ++ baseLetter base : "}" ++ digits ++ "}"
     (NumValRange base start end)      ->  numValPrelude ++ baseLetter base : "}" ++ start ++ "\\textbf{" ++ '-' : "}" ++ end ++ "}"
     (NumValSequence base digitGroups) ->  numValPrelude ++ baseLetter base : "}" ++ intercalate ("\\textbf{" ++ '.' : "}") digitGroups ++ "}"
-    (Prose prose)                     ->  "\\textbf{\\textless}" ++ "\\textcolor{olive}{" ++ stringAsLaTeX prose ++ "}" ++ "\\textbf{\\textgreater}"
+    (Prose prose)                     ->  "\\textcolor{olive}{\\textbf{<}" ++ stringAsLaTeX prose ++ "\\textbf{>}}"
     (Rulename name)                   ->  "\\emph{" ++ stringAsLaTeX name ++ "}"
     (Whitespace w)                    ->  singleton w
     (Whitespaces ws)                  ->  "\\mbox{" ++ fmap (const '~') ws ++ "}"
@@ -503,8 +508,8 @@ instance DocumentRepresentable ParseTree where
       --  Converts a single character into a LaTeX escape sequence, if any
       charAsLaTeX :: Char -> String
       charAsLaTeX '-'              = "-{}"
-      charAsLaTeX '<'              = "\\textless{}"
-      charAsLaTeX '>'              = "\\textgreater{}"
+      --charAsLaTeX '<'              = "\\textless{}"
+      --charAsLaTeX '>'              = "\\textgreater{}"
       charAsLaTeX '~'              = "\\textasciitilde{}"
       charAsLaTeX '^'              = "\\textasciicircum{}"
       charAsLaTeX '\\'             = "\\textbackslash{}"
@@ -525,9 +530,10 @@ processABNF :: String -> Either String String
 processABNF source =
   case readP_to_S rulelist source of
     []        ->  --  Parser couldn't even start
-                  Left "Parsing error in line 1"
+                  Left "Error at the beginning of file"
     parsings  ->  --  Choose the parser that processed the most of the source
-                  let (lenUnparsed, tree, unparsed) = foldl1' longestParse $ addLength <$> parsings
+                  let (tree, unparsed)  = minimumBy (compare `on` length . snd) parsings
+                      lenUnparsed       = length unparsed
                   in  if lenUnparsed == 0
                         then
                           --  If it's all processed, pretty-print the parse tree and return it
@@ -537,14 +543,6 @@ processABNF source =
                           let (line, col) = lineCol $ flip take source $ length source - lenUnparsed
                           in  Left $ "Parsing error in line " ++ show line ++ ", column " ++ show col
   where
-    --  Adds the length of the unparsed string to a (tree, unparsed) pair
-    addLength :: (ParseTree, String) -> (Int, ParseTree, String)
-    addLength (tree, unparsed) = (length unparsed, tree, unparsed)
-    --
-    --  Chooses the longest parse (with the least unparsed source)
-    longestParse :: (Int, ParseTree, String) -> (Int, ParseTree, String) -> (Int, ParseTree, String)
-    longestParse a@(lenA, _, _) b@(lenB, _, _) = if lenA < lenB then a else b
-    --
     --  Obtains the last (line, col) position of a text
     lineCol :: String -> (Int, Int)
     lineCol = lineColWorker (1, 1)
