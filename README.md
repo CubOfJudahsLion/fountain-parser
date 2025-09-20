@@ -56,7 +56,7 @@ such as production bibles.
 
 # Implementation Specifics
 
-- As per the [syntax guide](https://fountain.io/syntax/):
+- As per the <u>[syntax guide](https://fountain.io/syntax/)</u>:
 
   - This library expects Fountain text to be encoded in
     <span style="font-variant: small-caps">UTF-8</span>.
@@ -87,56 +87,50 @@ such as production bibles.
 ## Tentative Grammar
 
 The following is an attempt to formalize the syntax in
-[<span style="font-variant: small-caps">ABNF</span>](https://datatracker.ietf.org/doc/html/rfc5234),
-drawing from the [syntax guide](https://fountain.io/syntax/) and
+<u>[<span style="font-variant: small-caps">ABNF</span>](https://datatracker.ietf.org/doc/html/rfc5234)</u>,
+drawing from the <u>[syntax guide](https://fountain.io/syntax/)</u> and
 <span style="font-variant: small-caps">Objective C</span>
 <u>[implementation](https://github.com/nyousefi/Fountain)</u>. It
 incorporates <span style="font-variant: small-caps">Unicode</span> codepoints and tries
 to err in the side of lenience.
 
 ``` abnf
-;; The grammar is currently ambiguous, requiring unrestricted lookahead or backtracking.
-;; The "maximal-munch" rule applies: the longest match is considered the valid one.
+;; The grammar is ambiguous, requiring lots of lookahead, or backtracking.
 
-;; Some characters will be described as regular expressions character classes inside prose
-;; values (i.e., <regex:...>) as it's more concise than enumerating multiple character
-;; ranges; \p{...}/\P{...} (having/not-having Unicode property) and [:defined-set:] notations
-;; will be used as well.  The <lookahead:...> expression is self-explanatory.
+;; ABNF is used here, but no BNF variant suits the grammar perfectly. Some characters will
+;; be described as regular expressions character classes inside prose values (i.e.,
+;; <regex:...>) as it's more concise than enumerating multiple character ranges; \p{...}
+;; and \P{...} (having/not-having Unicode property) and [:defined-set:] notations will be
+;; used, as well as <lookahead:...>, which is self-explanatory.
 
 
-fountain-screenplay = [cover-page] script-content
-
-empty-line = newline ; leading spacing will be considered later
-
-cover-page = 1*cover-entry
+; A screenplay is defined as an optional cover page (a list of cover entries) followed by
+; an also optional script (script elements.)
+fountain-screenplay = *cover-entry *script-element
 
 cover-entry = cover-key ":" *space cover-value newline
 
-; For the cover-key, the values ("TITLE" / "CREDIT" / "AUTHOR" / "SOURCE" / "DRAFT" 1*SPACE "DATE" / "CONTACT") are
-; printed in the cover page. Any other keys are regarded as metadata and ignored.
+; For the cover-key, the values:
+; ("TITLE" / "CREDIT" / "AUTHOR" / "SOURCE" / "DRAFT" 1*SPACE "DATE" / "CONTACT")
+; are printed in the cover page. Any other keys are regarded as metadata and ignored.
 cover-key = 1*<regex:[^:[:newline-char:]]>
 
-; A cover value follows on the same line, or has multiple indented lines starting below the cover key.
-cover-value = single-value / multi-value
+; A cover value follows on the same line, or has multiple indented lines starting in the
+; line below
+cover-value = single-value / multi-line-value
 
 ; Single value follows right after the colon
 single-value = 1*non-newline
 
 ; Multi-values are preceded by newlines and spaces
-multi-value = 1*(newline 1*space 1*non-newline)
+multi-line-value = 1*(newline 1*space 1*non-newline)
 
-; At the highest level, a script can have sections, synopses, transitions and scene headers... or
-; at least that's the theory. In practice, some authors include bits of prose and scene contents
-; (i.e., action and dialogue) before the first explicit scene header, as if there was an
-; implicit first scene. Thus the script content begins, by default, at the zeroth scene and the
-; zero-level section (which emcompasses the whole document and all sections.)
-script-content = *script-element
-
-; Some script elements need no preceding lines...
-script-element =  section / synopse / scene-content
-
-; ...but can have them, and others do need them.
-script-element =/ 1*emptyline (section / synopse / transition / scene / scene-content)
+; At the highest level, a script can have sections, synopses, transitions and scene headers --
+; though in practice some authors include bits of prose and scene contents (i.e., action and
+; dialogue) before the first explicit scene header, as if there was an implicit first scene.
+; Thus the script content begins, by default, at the zeroth scene and the zero-level section
+; (which emcompasses the whole document and all sections.)
+script-element = section / synopse / transition / scene / scene-content
 
 ; The section indicator starts with one or more hashes, indicating section hierarchy
 ; with the number of hashes. Thus, the highest explicitly declared section level in the
@@ -144,21 +138,25 @@ script-element =/ 1*emptyline (section / synopse / transition / scene / scene-co
 ; until the next section markup.
 section = 1*"#" *space 1*non-newline newline <lookahead: empty-line>
 
+; The empty line only contains spaces, if anything
+empty-line = *space newline
+
 ; A synopse is a single line starting with an equals sign.
 synopse = "=" *non-newline newline
 
-; Transitions begin with ">" or are all uppercase and end in "TO:"
+; Transitions come in three types: forced, uppercase (ending in TO:) and commonplace transitions.
+; In all cases, 
 transition = (forced-transition / uppercase-transition / common-transition) newline <lookahead: empty-line>
 
-; If it begins with ">", we need to make sure it doesn't end in "<" as that's centered text
+; If it b egins with ">", we need to make sure it doesn't end in "<" as that's centered text
 forced-transition = ">" 1*<regex:[^[:newline-char:]<]>
 
 ; Uppercase transitions are all uppercase end in "TO:"
 uppercase-transition = 1*<regex:[^\p{Ll}[:newline-char:]]> 1*space %s"TO" *space ":" *space
 
 ; Some extra patterns that represent transitions, such as cuts, dissolves and fades (including
-; "fade in" and "fade out" at the beginning/end of the script.) Allow periods, colon and
-; ellipses at the end of such sentences.
+; "fade in" and "fade out" at the beginning/end of the script.) Allow a period, colon or
+; ellipsis at the end of such sentences.
 common-transition = (fade-transition / cut-dissolve-transition) *space [("." [".."] / ":") *space]
 
 fade-transition = "FADE" 1*space ("IN" / "OUT" / "TO")
@@ -193,16 +191,8 @@ scene-number = "#" 1*scene-number-character "#" *space
 
 scene-number-character = alphanumeric / "-" / "."
 
-
-
-
-
-
-;;; 
-;;heading = 1*"#" *space *<regex:[^[:newline-char:]]>
-;;
 ;;power-action-line = "!" *<regex:[^!\n]> "\n"
-;;
+
 ;;power-character-line = "@" 1*<regex:[^[:newline-char:](]> ["(" <regex:[^[:newline-char:])]> ")"] *space ["^" *space]
 
 
@@ -259,7 +249,8 @@ only available since 9.2.1, constituting a hard limit.
 Some of the included scripts require `make`, `sed` and other similar
 utilities usually found in <span style="font-variant: small-caps">Linux</span> or
 <span style="font-variant: small-caps">Linux</span>-like environments (e.g.,
-<u>[<span style="font-variant: small-caps">MSYS2</span>](https://www.msys2.org/)</u>.)
+<u>[<span style="font-variant: small-caps">MSYS2</span>](https://www.msys2.org/)</u>,
+which is included in the Windows <u>[ghcup]()</u> distribution.)
 However, nothing prevents the user from running `cabal`, `pandoc` or
 `pdflatex` as shown in the <u>[`Makefile`](run:./Makefile)</u>.
 
@@ -269,7 +260,6 @@ Please <u>[create an
 issue](https://github.com/CubOfJudahsLion/fountain-parser/issues)</u> if
 you find a bug.
 
-I can be reached directly at
-<span style="font-family: serif">*10951848+CübO̱fJúdãhsLîòn* ă(t)
+I can be reached at <span style="font-family: serif">*10951848+CübO̱fJúdãhsLîòn* ă(t)
 *users/noreply/gīthụb/cȯm*</span> (without diacritics and replacing
 slashes by periods.)
