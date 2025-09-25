@@ -29,7 +29,7 @@ data PreprocessedContent  = NewlineContent            -- ^  A newline
 --    Portraits tabs as 4-places long, zero-width spaces as such, and
 --    everything else occupying 1 place.
 expandedCharSize :: Char -> Int
-expandedCharSize 't'                                  = 4
+expandedCharSize '\t'                                 = 4
 expandedCharSize ch | ch `elem` ['\x200A', '\x200B']  = 0
                     | otherwise                       = 1
 
@@ -89,26 +89,27 @@ preprocessSource = optimizePreprocessed . preprocessSource' (id, NewlineContent)
     preprocessSource' :: ([PreprocessedContent] -> [PreprocessedContent], PreprocessedContent)  -- ^  Total (differential) and current-line accumulator
                       -> Text                                                                   -- ^  Remaining text to be processed
                       -> [PreprocessedContent]                                                  -- ^  Return value: a list of preprocessed content
-    --  Trivial cases (at end of text.)
-    preprocessSource' (totalAccumFn, contentAccum) Empty  = totalAccumFn $ contentAccum : [NewlineContent]
+    --  Trivial cases (at end of text.) Unclosed boneyards become text.
+    preprocessSource' (totalAccumFn, BoneyardContent b) Empty = totalAccumFn [TextContent $ T.append "/*" b, NewlineContent]
+    preprocessSource' (totalAccumFn, contentAccum) Empty      = totalAccumFn [contentAccum, NewlineContent]
     --  Beginning and end Boneyard markers
-    preprocessSource' accums ('/'  :< '*'  :< rest)       = preprocessSource' (accumulateMark accums BeginBoneyardMark) rest
-    preprocessSource' accums ('*'  :< '/'  :< rest)       = preprocessSource' (accumulateMark accums EndBoneyardMark) rest
+    preprocessSource' accums ('/'  :< '*'  :< rest)           = preprocessSource' (accumulateMark accums BeginBoneyardMark) rest
+    preprocessSource' accums ('*'  :< '/'  :< rest)           = preprocessSource' (accumulateMark accums EndBoneyardMark) rest
     --  Any newlines move the line accumulator into the global accumulator and start an empty line accumulator.
-    preprocessSource' accums ('\r' :< '\n' :< rest)       = preprocessSource' (accumulateMark accums NewlineMark) rest
-    preprocessSource' accums ('\n' :< '\r' :< rest)       = preprocessSource' (accumulateMark accums NewlineMark) rest
+    preprocessSource' accums ('\r' :< '\n' :< rest)           = preprocessSource' (accumulateMark accums NewlineMark) rest
+    preprocessSource' accums ('\n' :< '\r' :< rest)           = preprocessSource' (accumulateMark accums NewlineMark) rest
     preprocessSource' accums (ch   :<         rest)
       --  We're interpreting vertical tabs and formfeed as newlines.  \x0085, \x2028 and \x2029 (Unicode for,
       --  respectively, next-line, line-separator and paragraph separator) are also intepreted as newlines.
       | ch `elem` ['\n', '\r',
                    '\v', '\f',
-                   '\x0085', '\x2028', '\x2029']          = preprocessSource' (accumulateMark accums NewlineMark) rest
+                   '\x0085', '\x2028', '\x2029']              = preprocessSource' (accumulateMark accums NewlineMark) rest
       --  The following spaces are replaced by a regular space(s): tab (4 spaces), %x00A0 (non-breaking), %x2000-2009
       --  (varying-width Em/En-based spaces), %x202F (narrow non-breaking), %x205F (mathematical middle-space), %x3000
       --  (Ideographic space.) Zero-width spaces (\x200B) and hair-width spaces (\x200A) are simply removed.
       | ch `elem` ['\t', ' ', '\x00A0'] ++
                   ['\x2000' .. '\x200B'] ++
-                  ['\x202F', '\x205F', '\x3000']          = preprocessSource' (accumulateMark accums (SpaceMark ch))  rest
+                  ['\x202F', '\x205F', '\x3000']              = preprocessSource' (accumulateMark accums (SpaceMark ch))  rest
       --  Any other character is just appended to the line accumulator.
-      | otherwise                                         = preprocessSource' (accumulateMark accums (OtherCharMark ch)) rest
+      | otherwise                                             = preprocessSource' (accumulateMark accums (OtherCharMark ch)) rest
 
