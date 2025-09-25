@@ -20,7 +20,7 @@ README.pdf: $(README_SOURCES)
 
 README.md: $(README_SOURCES)
 	# Remove
-	sed -re 's|^[[:blank:]]*\\input\{\./fountain-grammar\.tex\}.*$$|-=fountain-grammar.abnf=-|' README.tex \
+	sed -re 's|^[[:blank:]]*\\input\{fountain-grammar\}.*$$|-=fountain-grammar.abnf=-|' README.tex \
 	| pandoc -f latex -t gfm --strip-comments --standalone \
 	| sed -re '/-=fountain-grammar\.abnf=-/ {
 	s/^.*$$/``` abnf/

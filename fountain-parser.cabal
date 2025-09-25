@@ -69,11 +69,12 @@ library
     import:           warnings
 
     -- Modules exported by the library.
-    exposed-modules:  Language.Fountain.Tokenizer.L0Token
-                    , Language.Fountain.Tokenizer.L0Tokenizer
+    exposed-modules:  Language.Fountain.Preprocess
+    --                Language.Fountain.Tokenizer.L0Token
+    --              , Language.Fountain.Tokenizer.L0Tokenizer
 
     -- Modules included in this library but not exported.
-    --other-modules:
+    other-modules:    Data.Text.Utils.Patterns
     -- LANGUAGE extensions used by modules in this package.
     -- other-extensions:
 

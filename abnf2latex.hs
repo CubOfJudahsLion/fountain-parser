@@ -48,7 +48,7 @@
 
 
 {-# OPTIONS_GHC -XHaskell2010 #-}
-{-# LANGUAGE BangPatterns #-}
+{-# LANGUAGE BangPatterns, LambdaCase #-}
 module Main (main) where
 
 
@@ -436,7 +436,7 @@ rulelist  =   Rulelist . concat
 
 
 ----------------------------------------
---  Document Representations of elements
+--  Document representations of elements
 ----------------------------------------
 
 --  This is a class of elements that can be represented on a document
@@ -446,7 +446,7 @@ class DocumentRepresentable d where
 
 --  Automatic instance: any array of representables is representable itself
 instance (DocumentRepresentable d) => DocumentRepresentable [d] where
-  docRep ds = concatMap docRep ds
+  docRep = concatMap docRep
 
 
 ----------------------------------------
@@ -478,7 +478,7 @@ instance DocumentRepresentable CaseSensitivity where
 
 --  Returns parse trees as Strings with LaTeX formatting
 instance DocumentRepresentable ParseTree where
-  docRep tree = case tree of
+  docRep = \case
     (CharVal caseSensitivity str)     ->  "\\textcolor{BrickRed}{" ++ docRep caseSensitivity ++ '"' : stringAsLaTeX str ++ '"' : "}"
     (NumValSingle base digits)        ->  numValPrelude ++ baseLetter base : "}" ++ digits ++ "}"
     (NumValRange base start end)      ->  numValPrelude ++ baseLetter base : "}" ++ start ++ "\\textbf{" ++ '-' : "}" ++ end ++ "}"
@@ -486,7 +486,7 @@ instance DocumentRepresentable ParseTree where
     (Prose prose)                     ->  "\\textcolor{olive}{\\textbf{<}" ++ stringAsLaTeX prose ++ "\\textbf{>}}"
     (Rulename name)                   ->  "\\emph{" ++ stringAsLaTeX name ++ "}"
     (Whitespace w)                    ->  singleton w
-    (Whitespaces ws)                  ->  "\\mbox{" ++ fmap (const '~') ws ++ "}"
+    (Whitespaces ws)                  ->  "\\mbox{" ++ concatMap (const "\\ ") ws ++ "}"
     (Printable s)                     ->  stringAsLaTeX s
     (Comment tree)                    ->  "\\textcolor{gray}{" ++ ';' : docRep tree ++ "}"
     (Newline nl)                      ->  "\\\\" ++ nl
@@ -507,17 +507,17 @@ instance DocumentRepresentable ParseTree where
       --
       --  Converts a single character into a LaTeX escape sequence, if any
       charAsLaTeX :: Char -> String
-      charAsLaTeX '-'              = "-{}"
+      charAsLaTeX '-'              = "{-}"
       --charAsLaTeX '<'              = "\\textless{}"
       --charAsLaTeX '>'              = "\\textgreater{}"
-      charAsLaTeX '~'              = "\\textasciitilde{}"
-      charAsLaTeX '^'              = "\\textasciicircum{}"
-      charAsLaTeX '\\'             = "\\textbackslash{}"
-      charAsLaTeX '\''             = "\\'{ }"
-      charAsLaTeX '`'              = "\\`{ }"
+      charAsLaTeX '~'              = "{\\textasciitilde}"
+      charAsLaTeX '^'              = "{\\textasciicircum}"
+      charAsLaTeX '\\'             = "{\\textbackslash}"
+      charAsLaTeX '\''             = "\\'{}"
+      charAsLaTeX '`'              = "\\`{}"
       charAsLaTeX c
-        | c `elem` ('&':"%$#_{}") = '\\' : c : "{}"
-        | otherwise               = [c]
+        | c `elem` ('&':"%$#_{}") = '{' : '\\' : c : "}"
+        | otherwise               = singleton c
       --
       --  Replaces all special LaTeX characters in string with equivalent literals
       stringAsLaTeX :: String -> String
@@ -532,16 +532,20 @@ processABNF source =
     []        ->  --  Parser couldn't even start
                   Left "Error at the beginning of file"
     parsings  ->  --  Choose the parser that processed the most of the source
-                  let (tree, unparsed)  = minimumBy (compare `on` length . snd) parsings
-                      lenUnparsed       = length unparsed
-                  in  if lenUnparsed == 0
-                        then
-                          --  If it's all processed, pretty-print the parse tree and return it
-                          Right $ docRep tree
-                        else
-                          --  Otherwise, use what was processed to find a line and column for the error report
-                          let (line, col) = lineCol $ flip take source $ length source - lenUnparsed
-                          in  Left $ "Parsing error in line " ++ show line ++ ", column " ++ show col
+                  let
+                    (tree, unparsed)  = minimumBy (compare `on` length . snd) parsings
+                    lenUnparsed       = length unparsed
+                  in
+                    if lenUnparsed == 0
+                      then
+                        --  If it's all processed, pretty-print the parse tree and return it
+                        Right $ docRep tree
+                      else
+                        --  Otherwise, use what was processed to find a line and column for the error report
+                        let
+                          (line, col) = lineCol $ flip take source $ length source - lenUnparsed
+                        in
+                          Left $ "Parsing error in line " ++ show line ++ ", column " ++ show col
   where
     --  Obtains the last (line, col) position of a text
     lineCol :: String -> (Int, Int)

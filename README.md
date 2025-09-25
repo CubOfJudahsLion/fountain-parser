@@ -1,5 +1,8 @@
 ---
-title: fountain-parser v.0.1.0.0 README
+title: |
+  fountain-parser README  
+    
+  version 0.1.0.0
 ---
 
 # Synopsis
@@ -23,7 +26,7 @@ form.
 
 This software is distributed *as-is* under the terms of the
 <span style="font-variant: small-caps">BSD Three-Clause license</span>. See the
-<u>[LICENSE](run:./LICENSE)</u> file for more details.
+<u>[`LICENSE`](run:./LICENSE)</u> file for more details.
 
 # Motivation
 
@@ -31,7 +34,7 @@ The <u>[*Developers* section](https://fountain.io/developers/)</u> of
 the Fountain site provides a link to a <u>[parsing
 library](https://github.com/nyousefi/Fountain)</u> in
 <span style="font-variant: small-caps">Objective C</span>. This presents a portability
-issue: there *are* projects that make it possible to bridge
+issue: while there *are* projects that make it possible to bridge
 <span style="font-variant: small-caps">Objective C</span> and
 <span style="font-variant: small-caps">Haskell</span>, they’re platform- or
 framework-specific. That library informs this project in matching the
@@ -43,12 +46,12 @@ different Fountain entities even as it uses different parsing methods.
 conversion from <span style="font-variant: small-caps">Fountain</span> to a series of
 convenient formats (like `.tex`) without intervention from thirds.
 
-## My software already supports Fountain
+## My software already supports <span style="font-variant: small-caps">Fountain</span>
 
 The <u>[*Apps* section](https://fountain.io/apps/)</u> of the
 <span style="font-variant: small-caps">Fountain</span> site lists software that also
-imports or exports the format. There’s a caveat: most are either
-*cloud-based* and/or *proprietary*. By favoring (mostly) open formats,
+imports or exports the format. There’s a caveat: most are *cloud-based*
+and/or *proprietary*. By favoring (mostly) open formats,
 *fountain-parse* allows integration into many
 <span style="font-variant: small-caps">FLOSS</span> tools, enabling entirely
 non-proprietary workflows and helping the creation of compound documents
@@ -56,14 +59,20 @@ such as production bibles.
 
 # Implementation Specifics
 
+In general, the library parser is rather lenient, allowing liberal
+spacing and recognizing <span style="font-variant: small-caps">Unicode</span>
+codepoints. Languages without uppercase/lowercase distinction must
+resort to *power-user characters* for case-dependent items such as
+transitions (‘`>`’) and character names (‘`@`’).
+
 - As per the <u>[syntax guide](https://fountain.io/syntax/)</u>:
 
-  - This library expects Fountain text to be encoded in
-    <span style="font-variant: small-caps">UTF-8</span>.
+  - This library expects <span style="font-variant: small-caps">Fountain</span> text to
+    be encoded in <span style="font-variant: small-caps">UTF-8</span>.
 
   - Tabs are converted into **four** spaces.
 
-  - Your line-spacing is respected.
+  - Your line spacing is respected.
 
   - Initial spaces are ignored everywhere except in action lines.
 
@@ -78,11 +87,12 @@ such as production bibles.
 
 - Vertical tabs and form-feed characters are interpreted as line
   changes. For vertical spacing, use multiple blank lines and/or the
-  Fountain form feed character sequence instead.
+  <span style="font-variant: small-caps">Fountain</span> form feed character sequence
+  (“`===`”) instead.
 
 - The parser keeps everything: notes, boneyards, sections and synopses.
-  Some possible conversion targets have equivalents to those, thus it
-  might be desirable to preserve them.
+  Some possible conversion targets have analogues to those, so it might
+  be desirable to preserve them.
 
 ## Tentative Grammar
 
@@ -90,9 +100,7 @@ The following is an attempt to formalize the syntax in
 <u>[<span style="font-variant: small-caps">ABNF</span>](https://datatracker.ietf.org/doc/html/rfc5234)</u>,
 drawing from the <u>[syntax guide](https://fountain.io/syntax/)</u> and
 <span style="font-variant: small-caps">Objective C</span>
-<u>[implementation](https://github.com/nyousefi/Fountain)</u>. It
-incorporates <span style="font-variant: small-caps">Unicode</span> codepoints and tries
-to err in the side of lenience.
+<u>[implementation](https://github.com/nyousefi/Fountain)</u>.
 
 ``` abnf
 ;; The grammar is ambiguous, requiring lots of lookahead, or backtracking.
@@ -238,9 +246,9 @@ non-newline-or-hash = <regex:[^[:newline-char:]#]>
 
 # Building
 
-<span style="font-variant: small-caps">GHC</span> 9.6.7 and
-<span style="font-variant: small-caps">Cabal</span> 3.0 (or greater) are required to
-compile and run the test suite (once implemented.)
+<span style="font-variant: small-caps">GHC</span> 9.6.7 and
+<span style="font-variant: small-caps">Cabal</span> 3.0 (or greater) are required to
+compile the library and run the tests (*not implemented yet.*)
 
 The project uses the `GHC2021` language default. While it might be
 possible to compile it in earlier versions than 9.6.7, this default is
@@ -249,10 +257,13 @@ only available since 9.2.1, constituting a hard limit.
 Some of the included scripts require `make`, `sed` and other similar
 utilities usually found in <span style="font-variant: small-caps">Linux</span> or
 <span style="font-variant: small-caps">Linux</span>-like environments (e.g.,
-<u>[<span style="font-variant: small-caps">MSYS2</span>](https://www.msys2.org/)</u>,
-which is included in the Windows <u>[ghcup]()</u> distribution.)
-However, nothing prevents the user from running `cabal`, `pandoc` or
-`pdflatex` as shown in the <u>[`Makefile`](run:./Makefile)</u>.
+<u>[<span style="font-variant: small-caps">Msys2</span>](https://www.msys2.org/)</u>.
+For <span style="font-variant: small-caps">Windows</span> users, it is recommended to
+use the
+<u>[<span style="font-variant: small-caps">GHCup</span>](https://www.haskell.org/ghcup/)</u>
+distribution, allow the installer script to deploy
+<span style="font-variant: small-caps">Msys2</span> and then install the development
+packages.)
 
 # Contact
 
