@@ -153,7 +153,7 @@ section = 1*"#" 1*non-newline newline <lookahead: empty-line>
 synopse = "=" *non-newline newline
 
 ; A boneyard is non-nestable C-style comment (multiline) that can happen just anywhere.
-boneyard = "/*" *(<regex:[^*]> | "*" <lookahead: [^/]>) "*/"
+boneyard = "/*" *(<regex:[^*]> / "*" <lookahead: [^/]>) "*/"
 
 ; A note goes between double-brackets. Can appear everywhere just like boneyards.
 ; However, notes can't 
