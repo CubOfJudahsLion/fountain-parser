@@ -34,7 +34,6 @@ expandedCharSize ch | ch `elem` ['\x200A', '\x200B']  = 0
                     | otherwise                       = 1
 
 
-
 -- |  Types of one- or two-character marks
 data CharacterMark  = BeginBoneyardMark
                     | EndBoneyardMark
@@ -45,39 +44,41 @@ data CharacterMark  = BeginBoneyardMark
 
 -- |  Kinds of character-based identities found in preprocessing.
 markToText :: CharacterMark -> Text
-markToText BeginBoneyardMark                                = "/*"
-markToText EndBoneyardMark                                  = "*/"
-markToText NewlineMark                                      = "\n"
-markToText (SpaceMark '\t')                                 = T.pack $ replicate 4 ' '
-markToText (SpaceMark ch) | ch `elem` ['\x200A', '\x200B']  = T.empty
-                          | otherwise                       = " "
-markToText (OtherCharMark o)  = T.singleton o
+markToText BeginBoneyardMark                                    = "/*"
+markToText EndBoneyardMark                                      = "*/"
+markToText NewlineMark                                          = "\n"
+markToText (SpaceMark '\t')                                     = T.pack $ replicate 4 ' '
+markToText (SpaceMark ch) | ch `elem` ['\x200A', '\x200B']      = T.empty
+                          | otherwise                           = " "
+markToText (OtherCharMark o)                                    = T.singleton o
 
 
 -- |  Adds the next character mark to the total and current content accumulaters
 accumulateMark :: ([PreprocessedContent] -> [PreprocessedContent], PreprocessedContent) -- ^  Total accumulator (as difference list) and current content accumulator
                -> CharacterMark                                                         -- ^  Characters to accumulate
                -> ([PreprocessedContent] -> [PreprocessedContent], PreprocessedContent) -- ^  Returns: new accumulators after character(s) consumed
-accumulateMark (totalAccumFn, b@(BoneyardContent _))     EndBoneyardMark    = (totalAccumFn . (b :),              TextContent T.empty)
-accumulateMark (totalAccumFn, BoneyardContent b)         mark               = (totalAccumFn,                      BoneyardContent $ T.append b $ markToText mark)
-accumulateMark (totalAccumFn, content)                   BeginBoneyardMark  = (totalAccumFn . (content :),        BoneyardContent T.empty)
-accumulateMark (totalAccumFn, content)                   NewlineMark        = (totalAccumFn . (content :),        NewlineContent)
-accumulateMark (totalAccumFn, NewlineContent)            (SpaceMark s)      = (totalAccumFn . (NewlineContent :), InitialSpaceContent $ expandedCharSize s)
-accumulateMark (totalAccumFn, NewlineContent)            mark               = (totalAccumFn . (NewlineContent :), TextContent $ markToText mark)
-accumulateMark (totalAccumFn, InitialSpaceContent n)     (SpaceMark s)      = (totalAccumFn,                      InitialSpaceContent $ n + expandedCharSize s)
-accumulateMark (totalAccumFn, i@(InitialSpaceContent _)) mark               = (totalAccumFn . (i :),              TextContent $ markToText mark)
-accumulateMark (totalAccumFn, TextContent tc)            mark               = (totalAccumFn,                      TextContent $ T.append tc $ markToText mark)
+accumulateMark (!totalAccumFn, b@(BoneyardContent _))     EndBoneyardMark   = (totalAccumFn . (b :),              TextContent T.empty)
+accumulateMark (!totalAccumFn, BoneyardContent b)         mark              = (totalAccumFn,                      BoneyardContent $ T.append b $ markToText mark)
+accumulateMark (!totalAccumFn, content)                   BeginBoneyardMark = (totalAccumFn . (content :),        BoneyardContent T.empty)
+accumulateMark (!totalAccumFn, content)                   NewlineMark       = (totalAccumFn . (content :),        NewlineContent)
+accumulateMark (!totalAccumFn, NewlineContent)            (SpaceMark s)     = (totalAccumFn . (NewlineContent :), InitialSpaceContent $ expandedCharSize s)
+accumulateMark (!totalAccumFn, NewlineContent)            mark              = (totalAccumFn . (NewlineContent :), TextContent $ markToText mark)
+accumulateMark (!totalAccumFn, InitialSpaceContent n)     (SpaceMark s)     = (totalAccumFn,                      InitialSpaceContent $ n + expandedCharSize s)
+accumulateMark (!totalAccumFn, i@(InitialSpaceContent _)) mark              = (totalAccumFn . (i :),              TextContent $ markToText mark)
+accumulateMark (!totalAccumFn, TextContent tc)            mark              = (totalAccumFn,                      TextContent $ T.append tc $ markToText mark)
 
 
 -- |  Optimizes the list of preprocessed items by removing zero-length ones
+--    and concatenating successive texts.
 optimizePreprocessed :: [PreprocessedContent] -> [PreprocessedContent]
-optimizePreprocessed = foldr ignoreZeroes []
+optimizePreprocessed = foldr condense []
   where
-    ignoreZeroes :: PreprocessedContent -> [PreprocessedContent] -> [PreprocessedContent]
-    ignoreZeroes (InitialSpaceContent 0) accum  = accum
-    ignoreZeroes (TextContent Empty)     accum  = accum
-    ignoreZeroes (BoneyardContent Empty) accum  = accum
-    ignoreZeroes item accum                     = item : accum
+    condense :: PreprocessedContent -> [PreprocessedContent] -> [PreprocessedContent]
+    condense (InitialSpaceContent 0) accum                    = accum
+    condense (TextContent Empty)     accum                    = accum
+    condense (TextContent t1)        (TextContent t2 : rest)  = TextContent (T.append t1 t2) : rest
+    condense (BoneyardContent Empty) accum                    = accum
+    condense item                    accum                    = item : accum
 
 
 -- |  Preprocess the text, normalizing spacing and newlines. Returns the text as a sequence of `PreprocessedContent` items.

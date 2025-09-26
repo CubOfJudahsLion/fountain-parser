@@ -1,9 +1,9 @@
 ;; The grammar is ambiguous, requiring lots of lookahead, or backtracking.
 
 ;; ABNF is used here, but no BNF variant suits the grammar perfectly. Some characters will
-;; be described as regular expressions character classes inside prose values (i.e.,
-;; <regex:...>) as it's more concise than enumerating multiple character ranges; \p{...}
-;; and \P{...} (having/not-having Unicode property) and [:defined-set:] notations will be
+;; be described as regular expressions inside prose values (i.e.,  <regex:...>) as it's
+;; more concise than enumerating multiple character ranges; \p{...} and \P{...}
+;; (having/not-having Unicode property) and [:defined-set:] notations will be
 ;; used, as well as <lookahead:...>, which is self-explanatory.
 
 
@@ -33,7 +33,8 @@ multi-line-value = 1*(newline 1*space 1*non-newline)
 ; dialogue) before the first explicit scene header, as if there was an implicit first scene.
 ; Thus the script content begins, by default, at the zeroth scene and the zero-level section
 ; (which emcompasses the whole document and all sections.)
-script-element = section / synopse / transition / scene / scene-content
+script-element =  section / synopse / boneyard / note
+script-element =/ 1*empty-line (section / synopse / boneyard / note / transition / scene / scene-content)
 
 ; The section indicator starts with one or more hashes, indicating section hierarchy
 ; with the number of hashes. Thus, the highest explicitly declared section level in the

@@ -100,7 +100,9 @@ The following is an attempt to formalize the syntax in
 <u>[<span style="font-variant: small-caps">ABNF</span>](https://datatracker.ietf.org/doc/html/rfc5234)</u>,
 drawing from the <u>[syntax guide](https://fountain.io/syntax/)</u> and
 <span style="font-variant: small-caps">Objective C</span>
-<u>[implementation](https://github.com/nyousefi/Fountain)</u>.
+<u>[implementation](https://github.com/nyousefi/Fountain)</u>. Note that
+parsing actually occurs at the line level so the grammar should be
+considered a guide.
 
 # Building
 

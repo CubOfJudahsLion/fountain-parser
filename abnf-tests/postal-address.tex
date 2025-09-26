@@ -6,36 +6,36 @@
 \renewcommand{\textsuperscript}[1]{\raisebox{0.8ex}{#1}}
 \begin{document}
 {\scriptsize\ttfamily
-\emph{postal-{}address}\textbf{=}\emph{name-{}part} \emph{street} \emph{zip-{}part}\\
+\emph{postal{-}address}\textbf{=}\emph{name{-}part} \emph{street} \emph{zip{-}part}\\
 \\
-\emph{name-{}part}\textbf{=}\textcolor{teal}{\emph{\textbf{*}}}\textbf{(}\emph{personal-{}part} \emph{SP}\textbf{)} \emph{last-{}name}\textbf{[}\emph{SP} \emph{suffix}\textbf{]} \emph{CRLF}\\
+\emph{name{-}part}\textbf{=}\textcolor{teal}{\emph{\textbf{*}}}\textbf{(}\emph{personal{-}part} \emph{SP}\textbf{)} \emph{last{-}name}\textbf{[}\emph{SP} \emph{suffix}\textbf{]} \emph{CRLF}\\
 \\
-\emph{name-{}part}\textbf{=/}\emph{personal-{}part} \emph{CRLF}\\
+\emph{name{-}part}\textbf{=/}\emph{personal{-}part} \emph{CRLF}\\
 \\
-\emph{personal-{}part}\textbf{=}\emph{first-{}name}\textbf{/}\textbf{(}\emph{initial}\textcolor{BrickRed}{"."}\textbf{)}\\
+\emph{personal{-}part}\textbf{=}\emph{first{-}name}\textbf{/}\textbf{(}\emph{initial}\textcolor{BrickRed}{"."}\textbf{)}\\
 \\
-\emph{first-{}name}\textbf{=}\textcolor{teal}{\emph{\textbf{*}}}\emph{ALPHA}\\
+\emph{first{-}name}\textbf{=}\textcolor{teal}{\emph{\textbf{*}}}\emph{ALPHA}\\
 \\
 \emph{initial}\textbf{=}\emph{ALPHA}\\
 \\
-\emph{last-{}name}\textbf{=}\textcolor{teal}{\emph{\textbf{*}}}\emph{ALPHA}\\
+\emph{last{-}name}\textbf{=}\textcolor{teal}{\emph{\textbf{*}}}\emph{ALPHA}\\
 \\
 \emph{suffix}\textbf{=}\textbf{(}\textcolor{BrickRed}{"Jr."}\textbf{/}\textcolor{BrickRed}{"Sr."}\textbf{/}\textcolor{teal}{\emph{1\textbf{*}}}\textbf{(}\textcolor{BrickRed}{"I"}\textbf{/}\textcolor{BrickRed}{"V"}\textbf{/}\textcolor{BrickRed}{"X"}\textbf{)}\textbf{)}\\
 \\
-\emph{street}\textbf{=}\textbf{[}\emph{apt} \emph{SP}\textbf{]} \emph{house-{}num} \emph{SP} \emph{street-{}name} \emph{CRLF}\\
+\emph{street}\textbf{=}\textbf{[}\emph{apt} \emph{SP}\textbf{]} \emph{house{-}num} \emph{SP} \emph{street{-}name} \emph{CRLF}\\
 \\
 \emph{apt}\textbf{=}\textcolor{teal}{\emph{1\textbf{*}4}}\emph{DIGIT}\\
 \\
-\emph{house-{}num}\textbf{=}\textcolor{teal}{\emph{1\textbf{*}8}}\textbf{(}\emph{DIGIT}\textbf{/}\emph{ALPHA}\textbf{)}\\
+\emph{house{-}num}\textbf{=}\textcolor{teal}{\emph{1\textbf{*}8}}\textbf{(}\emph{DIGIT}\textbf{/}\emph{ALPHA}\textbf{)}\\
 \\
-\emph{street-{}name}\textbf{=}\textcolor{teal}{\emph{1\textbf{*}}}\emph{VCHAR}\\
+\emph{street{-}name}\textbf{=}\textcolor{teal}{\emph{1\textbf{*}}}\emph{VCHAR}\\
 \\
-\emph{zip-{}part}\textbf{=}\emph{town-{}name}\textcolor{BrickRed}{","}\emph{SP} \emph{state} \textcolor{teal}{\emph{1\textbf{*}2}}\emph{SP} \emph{zip-{}code} \emph{CRLF}\\
+\emph{zip{-}part}\textbf{=}\emph{town{-}name}\textcolor{BrickRed}{","}\emph{SP} \emph{state} \textcolor{teal}{\emph{1\textbf{*}2}}\emph{SP} \emph{zip{-}code} \emph{CRLF}\\
 \\
-\emph{town-{}name}\textbf{=}\textcolor{teal}{\emph{1\textbf{*}}}\textbf{(}\emph{ALPHA}\textbf{/}\emph{SP}\textbf{)}\\
+\emph{town{-}name}\textbf{=}\textcolor{teal}{\emph{1\textbf{*}}}\textbf{(}\emph{ALPHA}\textbf{/}\emph{SP}\textbf{)}\\
 \\
 \emph{state}\textbf{=}\textcolor{teal}{\emph{2}}\emph{ALPHA}\\
 \\
-\emph{zip-{}code}\textbf{=}\textcolor{teal}{\emph{5}}\emph{DIGIT}\textbf{[}\textcolor{BrickRed}{"-{}"}\textcolor{teal}{\emph{4}}\emph{DIGIT}\textbf{]}\\
+\emph{zip{-}code}\textbf{=}\textcolor{teal}{\emph{5}}\emph{DIGIT}\textbf{[}\textcolor{BrickRed}{"{-}"}\textcolor{teal}{\emph{4}}\emph{DIGIT}\textbf{]}\\
 
 }\end{document}
