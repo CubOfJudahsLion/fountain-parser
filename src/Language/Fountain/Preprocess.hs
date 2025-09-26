@@ -22,7 +22,7 @@ data PreprocessedContent  = NewlineContent            -- ^  A newline
                           | InitialSpaceContent !Int  -- ^  A number of spaces at the beginning of a line
                           | TextContent !Text         -- ^  Actual text content
                           | BoneyardContent !Text     -- ^  A boneyard with its content
-  deriving (Show)
+  deriving (Eq, Show)
 
 
 -- |  Measures the number of places used by a character when expanded.

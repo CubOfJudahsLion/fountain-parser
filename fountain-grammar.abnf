@@ -33,20 +33,27 @@ multi-line-value = 1*(newline 1*space 1*non-newline)
 ; dialogue) before the first explicit scene header, as if there was an implicit first scene.
 ; Thus the script content begins, by default, at the zeroth scene and the zero-level section
 ; (which emcompasses the whole document and all sections.)
-script-element =  section / synopse / boneyard / note
-script-element =/ 1*empty-line (section / synopse / boneyard / note / transition / scene / scene-content)
+script-element =  *space (section / synopse / boneyard / note)
+script-element =/ 1*empty-line *space (section / synopse / boneyard / note / transition / scene / scene-content)
 
 ; The section indicator starts with one or more hashes, indicating section hierarchy
 ; with the number of hashes. Thus, the highest explicitly declared section level in the
 ; hierarchy is level one, always under zero. The section encompasses all content below
 ; until the next section markup.
-section = 1*"#" *space 1*non-newline newline <lookahead: empty-line>
-
-; The empty line only contains spaces, if anything
-empty-line = *space newline
+section = 1*"#" 1*non-newline newline <lookahead: empty-line>
 
 ; A synopse is a single line starting with an equals sign.
 synopse = "=" *non-newline newline
+
+; A boneyard is non-nestable C-style comment (multiline) that can happen just anywhere.
+boneyard = "/*" *(<regex:[^*]> | "*" <lookahead: [^/]>) "*/"
+
+; A note goes between double-brackets. Can appear everywhere just like boneyards.
+; However, notes can't 
+note = "[["  "]]"
+
+; The empty line only contains spaces, if anything
+empty-line = *space newline
 
 ; Transitions come in three types: forced, uppercase (ending in TO:) and commonplace transitions.
 ; In all cases, 
